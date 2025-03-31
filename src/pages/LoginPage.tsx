@@ -35,8 +35,7 @@ const LoginPage = () => {
 
       const data = await response.json();
       saveToken(data.tokenString);
-      saveToken(data.token);     // ✅ сохраняем токен
-      navigate("/tasks");        // ✅ переходим на страницу задач
+      navigate("/tasks");
 
     } catch (err) {
       setError("Сервер недоступен. Проверьте подключение. "+err);
