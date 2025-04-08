@@ -30,19 +30,19 @@ const TaskCard: React.FC<TaskCardProps> = ({
   shortAnswer,
 }) => {
   return (
-    <div className="bg-white p-4 rounded-lg shadow mb-4">
+    <div className="bg-background text-text p-4 rounded-lg shadow mb-4">
       <div className="flex flex-wrap justify-between items-center mb-2">
         <h3 className="text-lg font-bold">{title}</h3>
-        <div className="flex gap-2 text-xs text-gray-600">
+        <div className="flex gap-2 text-xs">
           {testNumbers.map((num, i) => (
-            <span key={i} className="bg-gray-200 px-2 py-0.5 rounded">
+            <span key={i} className="bg-secondary text-background px-2 py-0.5 rounded">
               📘 {num}
             </span>
           ))}
         </div>
       </div>
 
-      {textContent && <p className="text-sm text-gray-700 mb-2">{textContent}</p>}
+      {textContent && <p className="text-sm mb-2">{textContent}</p>}
 
       {imageContent?.imageBase64 && (
         <img
@@ -52,12 +52,12 @@ const TaskCard: React.FC<TaskCardProps> = ({
         />
       )}
 
-      <div className="flex flex-wrap gap-4 text-xs text-gray-500 mt-2">
+      <div className="flex flex-wrap gap-4 text-xs mt-2">
         {type && <span>✏️ Тип: {type}</span>}
         {groupNumber !== undefined && <span>🎯 Группа: {groupNumber}</span>}
         {year && <span>📅 Год: {year}</span>}
         {relevance !== undefined && (
-          <span className={relevance ? "text-green-600" : "text-red-600"}>
+          <span className={relevance ? "text-green-500" : "text-red-500"}>
             {relevance ? "✅ Актуально" : "🚫 Неактуально"}
           </span>
         )}
@@ -68,7 +68,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
         {tagNames?.map((tag, i) => (
           <span
             key={`tag-${i}`}
-            className="text-xs bg-purple-100 text-purple-800 px-2 py-0.5 rounded cursor-help"
+            className="text-xs bg-purple-200 text-purple-900 px-2 py-0.5 rounded"
             title={`Тег: ${tag}`}
           >
             🏷️ {tag}
@@ -77,7 +77,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
         {topicNames?.map((topic, i) => (
           <span
             key={`topic-${i}`}
-            className="text-xs bg-teal-100 text-teal-800 px-2 py-0.5 rounded cursor-help"
+            className="text-xs bg-teal-200 text-teal-900 px-2 py-0.5 rounded"
             title={`Тема: ${topic}`}
           >
             📚 {topic}
@@ -86,7 +86,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
       </div>
 
       {shortAnswer !== undefined && (
-        <div className="mt-2 text-sm text-green-600">
+        <div className="mt-2 text-sm text-primary">
           ✅ Ответ: {shortAnswer}
         </div>
       )}
