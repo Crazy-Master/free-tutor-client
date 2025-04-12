@@ -10,8 +10,8 @@ interface PopupConfirmProps {
     onCancel,
   }: PopupConfirmProps) => {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-        <div className="bg-white dark:bg-gray-800 text-black dark:text-white p-6 rounded shadow-xl w-full max-w-sm text-center space-y-4">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm pointer-events-auto">
+        <div className="bg-white dark:bg-gray-800 text-black dark:text-white p-6 rounded shadow-xl w-full max-w-md text-center space-y-4">
           <p className="text-lg font-medium">{message}</p>
           <div className="flex justify-center gap-4">
             <button

@@ -1,5 +1,13 @@
 import { getToken } from "../store/auth";
-import { DisciplineDto, StudentCardInfoDto, StudentToTeacherDto } from "../types/api-types";
+import { DisciplineDto, StudentCardInfoDto, StudentToTeacherDto, TaskDto } from "../types/api-types";
+import { TaskFilterDto } from "../types/api-types";
+import { PagedResultDto } from "../types/api-types";
+import {
+  TaskTagDto,
+  TopicDto,
+  TestNumberDto,
+  TypeResponseDto
+} from "../types/api-types";
 
 const BASE_URL = "https://api-tutor-master.ru";
 
@@ -54,4 +62,19 @@ export const api = {
 
   deleteStudentLink: (id: number) =>
     request<void>(`/api/student-to-teacher/teacher/${id}`, "DELETE"),
+
+  getTasks: (filter: TaskFilterDto) =>
+    request<PagedResultDto<TaskDto>>("/api/tasks", "GET", filter),
+
+  getTaskTags: (userId?: number) =>
+    request<TaskTagDto[]>(`/api/task-tags${userId ? `?userId=${userId}` : ""}`),
+  
+  getTopics: (disciplineId?: number) =>
+    request<TopicDto[]>(`/api/topics${disciplineId ? `?disciplineId=${disciplineId}` : ""}`),
+  
+  getTestNumbers: (disciplineId?: number) =>
+    request<TestNumberDto[]>(`/api/test-numbers${disciplineId ? `?disciplineId=${disciplineId}` : ""}`),
+  
+  getTypeResponses: () =>
+    request<TypeResponseDto[]>("/api/type-responses"),
 };

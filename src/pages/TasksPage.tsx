@@ -1,83 +1,75 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Header from "../components/Header";
-import TaskCard from "../components/TaskCard";
-import { useAuth } from "../store/auth";
-
-interface ImageData {
-  imageBase64: string;
-}
-
-interface AnswerTask {
-  shortAnswer?: number;
-}
-
-interface Task {
-  taskId: number;
-  taskIdExternal: string;
-  textContent?: string;
-  imageContent?: ImageData;
-  problemSolving?: AnswerTask;
-  typeResponseId?: number;
-  groupNumber?: number;
-  year?: string;
-  relevance?: boolean;
-  resource?: string;
-  testNumber?: string;
-  tagIds?: number[];
-  topicIds?: number[];
-}
+import TaskFilterPanel from "../components/tasks/TaskFilterPanel";
+import TaskList, { Task } from "../components/tasks/TaskList";
+import Pagination from "../components/common/Pagination";
+import { useNavigate } from "react-router-dom";
+import { useUserInfoFromToken } from "../hooks/useUserInfoFromToken";
+import { TaskDto, TaskFilterDto, PagedResultDto } from "../types/api-types";
+import { mapTaskDtoToCardTask } from "../lib/mapTaskDtoToCardTask";
+import { api } from "../lib/api";
 
 const TasksPage: React.FC = () => {
-  const { token } = useAuth();
+  const navigate = useNavigate();
+  const userInfo = useUserInfoFromToken();
+
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [filter, setFilter] = useState<TaskFilterDto | null>(null);
+  const [totalPages, setTotalPages] = useState(1);
 
-  useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const response = await fetch("https://api-tutor-master.ru/api/tasks", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+  const fetchTasks = async (customFilter?: TaskFilterDto) => {
+    const usedFilter = customFilter ?? filter;
+    if (!usedFilter) return;
 
-        if (!response.ok) throw new Error("Ошибка при загрузке задач");
+    try {
+      setLoading(true);
+      const result: PagedResultDto<TaskDto> = await api.getTasks(usedFilter);
+      setTasks(result.items.map(mapTaskDtoToCardTask));
 
-        const data = await response.json();
-        setTasks(data);
-      } catch (err) {
-        setError("Не удалось загрузить задачи");
-        console.error(err);
-      }
-    };
+      const total = Math.ceil(result.totalCount / result.pageSize);
+      setTotalPages(total);
+    } catch (e) {
+      console.error("Ошибка загрузки задач:", e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchTasks();
-  }, [token]);
+  const handleSearch = (filterDto: TaskFilterDto) => {
+    setFilter(filterDto);
+    fetchTasks(filterDto);
+  };
+
+  const handleReset = () => {
+    setFilter(null);
+    setTasks([]);
+    setTotalPages(1);
+  };
+
+  const goToPage = (page: number) => {
+    if (!filter) return;
+    fetchTasks({ ...filter, pageNumber: page });
+  };
 
   return (
-    <div className="min-h-screen bg-background text-text">
-      <Header />
-      <div className="max-w-4xl mx-auto p-4">
-        <h2 className="text-2xl font-bold mb-4">Список задач</h2>
-        {error && <p className="text-red-600">{error}</p>}
-        {tasks.map((task) => (
-          <TaskCard
-            key={task.taskId}
-            title={task.taskIdExternal}
-            testNumbers={task.testNumber ? [task.testNumber] : []}
-            textContent={task.textContent}
-            imageContent={task.imageContent}
-            type={task.typeResponseId?.toString()}
-            groupNumber={task.groupNumber}
-            year={task.year?.substring(0, 4)}
-            relevance={task.relevance}
-            resource={task.resource}
-            tagNames={["Пример тега"]}
-            topicNames={["Пример темы"]}
-            shortAnswer={task.problemSolving?.shortAnswer}
+    <div className="min-h-screen flex flex-col">
+      <Header showBackButton onBack={() => navigate(-1)} userInfo={userInfo} />
+
+      <main className="flex-1 p-6 space-y-4">
+        <TaskFilterPanel onSearch={handleSearch} onReset={handleReset} />
+        <TaskList tasks={tasks} loading={loading} />
+      </main>
+
+      {tasks.length > 0 && totalPages > 1 && (
+        <div className="p-4 border-t">
+          <Pagination
+            currentPage={filter?.pageNumber ?? 1}
+            totalPages={totalPages}
+            onPageChange={goToPage}
           />
-        ))}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
