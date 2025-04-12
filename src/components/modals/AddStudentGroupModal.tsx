@@ -100,7 +100,6 @@ const AddStudentGroupModal = ({ disciplineId, onClose, onSuccess }: Props) => {
           </div>
         </form>
 
-        {/* Отображение полного текста ошибки в отдельном модальном окне */}
         {showFullError && (
           <PopupConfirm
             message={error}

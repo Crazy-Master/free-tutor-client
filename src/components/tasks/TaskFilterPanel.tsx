@@ -1,24 +1,88 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
+import { useUserInfoFromToken } from "../../hooks/useUserInfoFromToken";
+import { api } from "../../lib/api";
+import MultiSelectDropdown from "../common/MultiSelectDropdown";
+import SingleSelectDropdown from "../common/SingleSelectDropdown";
+import { useDictionaryStore } from "../../store/dictionaryStore";
 import { TaskFilterDto } from "../../types/api-types";
 
 interface Props {
-  onSearch: (filter: TaskFilterDto) => void;
+  onSearch: (dto: TaskFilterDto) => void;
   onReset?: () => void;
 }
 
 const TaskFilterPanel: React.FC<Props> = ({ onSearch, onReset }) => {
+  const userInfo = useUserInfoFromToken()
+  
+  const [taskId, setTaskId] = useState("");
+  const [taskIdExternal, setTaskIdExternal] = useState("");
+  const [typeResponseId, setTypeResponseId] = useState<number | null>(null);
   const [tagIds, setTagIds] = useState<number[]>([]);
   const [topicIds, setTopicIds] = useState<number[]>([]);
   const [testNumberIds, setTestNumberIds] = useState<number[]>([]);
-  const [typeResponseId, setTypeResponseId] = useState<number | null>(null);
-  const [taskId, setTaskId] = useState<string>("");
-  const [taskIdExternal, setTaskIdExternal] = useState<string>("");
 
-  const handleSubmit = () => {
+  const [expanded, setExpanded] = useState(false);
+
+  const {
+    taskTags,
+    topics,
+    testNumbers,
+    typeResponses,
+    loadedTaskTags,
+    loadedTopics,
+    loadedTestNumbers,
+    loadedTypeResponses,
+    setTaskTags,
+    setTopics,
+    setTestNumbers,
+    setTypeResponses,
+  } = useDictionaryStore();
+
+  const disciplineId = localStorage.getItem("selectedDisciplineId")
+    ? parseInt(localStorage.getItem("selectedDisciplineId")!)
+    : 0;
+
+  useEffect(() => {
+    if (!userInfo || !disciplineId) return;
+
+    if (!loadedTaskTags && taskTags.length === 0) {
+      api.getTaskTags(userInfo.userId).then(setTaskTags);
+    }
+
+    if (!loadedTopics && topics.length === 0) {
+      api.getTopics(disciplineId).then(setTopics);
+    }
+
+    if (!loadedTestNumbers && testNumbers.length === 0) {
+      api.getTestNumbers(disciplineId).then(setTestNumbers);
+    }
+
+    if (!loadedTypeResponses && typeResponses.length === 0) {
+      api.getTypeResponses().then(setTypeResponses);
+    }
+
+  }, [
+    userInfo,
+    disciplineId,
+    taskTags,
+    topics,
+    testNumbers,
+    typeResponses,
+    loadedTaskTags,
+    loadedTopics,
+    loadedTestNumbers,
+    loadedTypeResponses,
+    setTaskTags,
+    setTopics,
+    setTestNumbers,
+    setTypeResponses,
+  ]);
+
+  const handleSearch = () => {
     onSearch({
-      tagIds,
-      topicIds,
-      testNumberIds,
+      tagIds: tagIds.length > 0 ? tagIds : undefined,
+      topicIds: topicIds.length > 0 ? topicIds : undefined,
+      testNumberIds: testNumberIds.length > 0 ? testNumberIds : undefined,
       typeResponseId: typeResponseId ?? undefined,
       taskId: taskId ? parseInt(taskId) : undefined,
       taskIdExternal: taskIdExternal || undefined,
@@ -38,39 +102,132 @@ const TaskFilterPanel: React.FC<Props> = ({ onSearch, onReset }) => {
   };
 
   return (
-    <div className="border p-4 rounded shadow-md space-y-2">
-      <div className="flex flex-wrap gap-4">
-        <input
-          type="text"
-          value={taskId}
-          onChange={(e) => setTaskId(e.target.value)}
-          placeholder="Номер на сайте"
-          className="border px-3 py-1 rounded w-48"
-        />
-        <input
-          type="text"
-          value={taskIdExternal}
-          onChange={(e) => setTaskIdExternal(e.target.value)}
-          placeholder="Номер на ФИПИ"
-          className="border px-3 py-1 rounded w-48"
-        />
-        {/* Тут появятся выпадающие списки тегов, тем, и прочее */}
-      </div>
+    <div className="w-full bg-gray-100 p-4 mb-4 rounded-lg shadow-md">
+      <button
+        onClick={() => setExpanded((prev) => !prev)}
+        className="mb-4 px-4 py-2 bg-primary text-white rounded hover:opacity-90"
+      >
+        {expanded ? "Скрыть фильтр" : "Показать фильтр"}
+      </button>
 
-      <div className="flex gap-4 pt-2">
-        <button
-          onClick={handleSubmit}
-          className="bg-primary text-white px-4 py-2 rounded"
-        >
-          Найти
-        </button>
-        <button
-          onClick={handleReset}
-          className="border px-4 py-2 rounded hover:bg-gray-100"
-        >
-          Сбросить фильтр
-        </button>
-      </div>
+      {expanded && (
+        <div className="space-y-4 transition-all duration-300">
+          <MultiSelectDropdown
+            label="Теги"
+            options={
+              tagsLoaded && taskTags.length === 0
+                ? [
+                    {
+                      id: -1,
+                      label: "отсутствует список тегов",
+                      disabled: true,
+                    },
+                  ]
+                : taskTags.map((t) => ({
+                    id: t.tagId,
+                    label: t.name,
+                    color: t.color,
+                  }))
+            }
+            selected={tagIds}
+            onChange={setTagIds}
+          />
+
+          <MultiSelectDropdown
+            label="Темы"
+            options={
+              topicsLoaded && topics.length === 0
+                ? [{ id: -1, label: "отсутствует список тем", disabled: true }]
+                : topics.map((t) => ({ id: t.topicId, label: t.topic }))
+            }
+            selected={topicIds}
+            onChange={setTopicIds}
+          />
+
+          <MultiSelectDropdown
+            label="Номера в тесте"
+            options={
+              numbersLoaded && testNumbers.length === 0
+                ? [
+                    {
+                      id: -1,
+                      label: "отсутствует список номеров",
+                      disabled: true,
+                    },
+                  ]
+                : testNumbers.map((n) => ({
+                    id: n.testNumberId,
+                    label: `${n.number} ${n.name ?? ""}`,
+                  }))
+            }
+            selected={testNumberIds}
+            onChange={setTestNumberIds}
+          />
+
+          <SingleSelectDropdown
+            label="Тип ответа"
+            options={
+              typesLoaded && typeResponses.length === 0
+                ? [
+                    {
+                      id: -1,
+                      label: "отсутствует список вариантов ответов",
+                      disabled: true,
+                    },
+                  ]
+                : typeResponses.map((t) => ({
+                    id: t.typeResponseId,
+                    label: t.nameResponse,
+                  }))
+            }
+            selected={typeResponseId}
+            onChange={setTypeResponseId}
+          />
+
+          <div className="flex flex-wrap gap-4">
+            <div className="flex flex-col max-w-[300px] w-full">
+              <label className="mb-1 text-sm text-gray-700">
+                Номер на сайте
+              </label>
+              <input
+                type="number"
+                placeholder="Введите ID"
+                value={taskId}
+                onChange={(e) => setTaskId(e.target.value)}
+                className="px-3 py-2 border rounded text-black"
+              />
+            </div>
+
+            <div className="flex flex-col max-w-[300px] w-full">
+              <label className="mb-1 text-sm text-gray-700">
+                Номер на ФИПИ
+              </label>
+              <input
+                type="text"
+                placeholder="Например: 10A"
+                value={taskIdExternal}
+                onChange={(e) => setTaskIdExternal(e.target.value)}
+                className="px-3 py-2 border rounded text-black"
+              />
+            </div>
+          </div>
+
+          <div className="flex gap-4 mt-2">
+            <button
+              onClick={handleSearch}
+              className="px-4 py-2 bg-primary text-white rounded hover:opacity-90"
+            >
+              Найти
+            </button>
+            <button
+              onClick={handleReset}
+              className="px-4 py-2 bg-gray-300 text-black rounded hover:opacity-90"
+            >
+              Сбросить фильтр
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

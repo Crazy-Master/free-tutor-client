@@ -6,16 +6,25 @@ import ProtectedRoute from "./lib/ProtectedRoute";
 import StudentPage from "./pages/StudentPage";
 import TeacherPage from "./pages/TeacherPage";
 import AdminPage from "./pages/AdminPage";
+import Layout from "./components/Layout";
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<LoginPage />} />
-  <Route path="/register" element={<RegistrationPage />} />
-  <Route path="/tasks" element={<ProtectedRoute><TasksPage /></ProtectedRoute>} />
-  <Route path="/student" element={<ProtectedRoute><StudentPage /></ProtectedRoute>} />
-  <Route path="/teacher" element={<ProtectedRoute><TeacherPage /></ProtectedRoute>} />
-  <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
+      <Route path="/register" element={<RegistrationPage />} />
+      <Route
+        element={
+          <ProtectedRoute>
+            <Layout />
+          </ProtectedRoute>
+        }
+      >
+        <Route path="/tasks" element={<TasksPage />} />
+        <Route path="/student" element={<StudentPage />} />
+        <Route path="/teacher" element={<TeacherPage />} />
+        <Route path="/admin" element={<AdminPage />} />
+      </Route>
     </Routes>
   );
 }

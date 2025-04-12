@@ -1,21 +1,13 @@
 import { useEffect, useState } from "react";
 import { useUser } from "../store/user";
 import { useUserInfoFromToken } from "../hooks/useUserInfoFromToken";
+import { useDisciplineStore } from "../store/disciplineStore";
 import { api } from "../lib/api";
-import PopupConfirm from "../components/ui/PopupConfirm";
-import Header from "../components/Header";
 import StudentList from "../components/teacher/StudentList";
 import ActionPanel from "../components/teacher/ActionPanel";
 import SettingsPanel from "../components/teacher/SettingsPanel";
 import AddStudentGroupModal from "../components/modals/AddStudentGroupModal";
 import { useNavigate } from "react-router-dom";
-
-
-interface DisciplineDto {
-  disciplineId: number;
-  discipline: string;
-  typeExam: string;
-}
 
 interface StudentCardInfoDto {
   id: number;
@@ -27,48 +19,23 @@ interface StudentCardInfoDto {
 const TeacherPage = () => {
   const { user } = useUser();
   const userInfo = useUserInfoFromToken();
+  const navigate = useNavigate();
 
-  const [disciplines, setDisciplines] = useState<DisciplineDto[]>([]);
-  const [selectedDisciplineId, setSelectedDisciplineId] = useState<
-    number | null
-  >(user?.information.lastDisciplineId ?? null);
+  const { disciplineId } = useDisciplineStore();
+
   const [students, setStudents] = useState<StudentCardInfoDto[]>([]);
-  const [pendingDisciplineId, setPendingDisciplineId] = useState<number | null>(
-    null
-  );
-  const [showConfirmDiscipline, setShowConfirmDiscipline] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [loadingStudents, setLoadingStudents] = useState(false);
   const [error, setError] = useState("");
-  const pendingDiscipline = disciplines.find(
-    (d) => d.disciplineId === pendingDisciplineId
-  );
-  const [panelView, setPanelView] = useState<
-    "students" | "profile" | "settings"
-  >("students");
-
-  const navigate = useNavigate();
+  const [panelView, setPanelView] = useState<"students" | "profile" | "settings">("students");
 
   useEffect(() => {
-    const fetchDisciplines = async () => {
-      try {
-        const res = await fetch("https://api-tutor-master.ru/api/disciplines");
-        const data = await res.json();
-        setDisciplines(data);
-      } catch {
-        setError("Ошибка загрузки дисциплин." + error);
-      }
-    };
-    fetchDisciplines();
-  }, []);
-
-  useEffect(() => {
-    if (!selectedDisciplineId) return;
+    if (!disciplineId) return;
 
     const fetchStudents = async () => {
       try {
         setLoadingStudents(true);
-        const data = await api.getStudents(selectedDisciplineId);
+        const data = await api.getStudents(disciplineId);
         setStudents(data);
       } catch (e) {
         if (e instanceof Error) {
@@ -81,51 +48,10 @@ const TeacherPage = () => {
     };
 
     fetchStudents();
-  }, [selectedDisciplineId]);
-
-  const handleDisciplineChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newId = Number(e.target.value);
-    if (newId !== selectedDisciplineId) {
-      setPendingDisciplineId(newId);
-      setShowConfirmDiscipline(true);
-    }
-  };
-
-  const confirmDisciplineChange = () => {
-    if (pendingDisciplineId !== null) {
-      setSelectedDisciplineId(pendingDisciplineId);
-    }
-    setPendingDisciplineId(null);
-    setShowConfirmDiscipline(false);
-  };
-
-  const cancelDisciplineChange = () => {
-    setPendingDisciplineId(null);
-    setShowConfirmDiscipline(false);
-  };
+  }, [disciplineId, error]);
 
   return (
     <div className="min-h-screen bg-background text-text">
-      <Header
-        disciplines={disciplines}
-        selectedDisciplineId={selectedDisciplineId}
-        pendingDisciplineId={pendingDisciplineId}
-        onDisciplineChange={handleDisciplineChange}
-        userInfo={userInfo}
-      />
-
-      {showConfirmDiscipline && (
-        <PopupConfirm
-          message={
-            pendingDiscipline
-              ? `Вы уверены, что хотите сменить дисциплину на: ${pendingDiscipline.typeExam} — ${pendingDiscipline.discipline}?`
-              : "Вы уверены, что хотите сменить дисциплину?"
-          }
-          onConfirm={confirmDisciplineChange}
-          onCancel={cancelDisciplineChange}
-        />
-      )}
-
       <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Левая колонка */}
         <div>
@@ -173,16 +99,16 @@ const TeacherPage = () => {
           onOpenTaskBase={() => navigate("/tasks")}
         />
       </div>
-      {showAddModal && selectedDisciplineId && (
-  <AddStudentGroupModal
-    disciplineId={selectedDisciplineId}
-    onClose={() => setShowAddModal(false)}
-    onSuccess={(newStudent) =>
-      setStudents((prev) => [...prev, newStudent])
-    }
-  />
-)}
 
+      {showAddModal && disciplineId && (
+        <AddStudentGroupModal
+          disciplineId={disciplineId}
+          onClose={() => setShowAddModal(false)}
+          onSuccess={(newStudent) =>
+            setStudents((prev) => [...prev, newStudent])
+          }
+        />
+      )}
     </div>
   );
 };

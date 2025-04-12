@@ -2,7 +2,6 @@ import React from "react";
 import PopupConfirm from "../ui/PopupConfirm";
 import StudentCard from "./StudentCard";
 
-
 export interface StudentCardInfoDto {
   id: number;
   studentId: number;
@@ -37,19 +36,21 @@ const StudentList: React.FC<StudentListProps> = ({
         <p>Загрузка учеников...</p>
       ) : (
         <div
-          className="border rounded p-4 overflow-y-auto relative"
+          className={`border rounded p-4 relative ${
+            students.length > 4 ? "overflow-y-auto" : ""
+          }`}
           style={{ maxHeight }}
         >
           {students.length === 0 ? (
             <p className="text-sm text-gray-500">Нет добавленных учеников</p>
           ) : (
             students.map((student) => (
-                <StudentCard
-                  key={student.id}
-                  student={student}
-                  onDelete={() => setToDelete(student)}
-                />
-              ))
+              <StudentCard
+                key={student.id}
+                student={student}
+                onDelete={() => setToDelete(student)}
+              />
+            ))
           )}
 
           {toDelete && (

@@ -4,19 +4,18 @@ import { FiChevronDown, FiCheck } from "react-icons/fi";
 export interface Option {
   id: number;
   label: string;
-  color?: string;
   disabled?: boolean;
 }
 
 interface Props {
   label: string;
   options: Option[];
-  selected: number[];
-  onChange: (selected: number[]) => void;
+  selected: number | null;
+  onChange: (id: number | null) => void;
   placeholder?: string;
 }
 
-const MultiSelectDropdown: React.FC<Props> = ({ label, options, selected, onChange }) => {
+const SingleSelectDropdown: React.FC<Props> = ({ label, options, selected, onChange }) => {
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -30,14 +29,12 @@ const MultiSelectDropdown: React.FC<Props> = ({ label, options, selected, onChan
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const toggleSelection = (id: number) => {
-    if (selected.includes(id)) {
-      onChange(selected.filter((item) => item !== id));
-    } else {
-      onChange([...selected, id]);
-    }
+  const handleSelect = (id: number) => {
+    onChange(id);
+    setIsOpen(false);
   };
 
+  const selectedLabel = options.find((o) => o.id === selected)?.label ?? "Выбор";
   const isEmpty = options.length === 1 && options[0].disabled;
 
   return (
@@ -54,7 +51,7 @@ const MultiSelectDropdown: React.FC<Props> = ({ label, options, selected, onChan
           onClick={() => setIsOpen((prev) => !prev)}
           className="w-full text-left px-3 py-2 border rounded bg-white text-black flex justify-between items-center"
         >
-          Выбор
+          {selectedLabel}
           <FiChevronDown className={`ml-2 transform ${isOpen ? "rotate-180" : ""}`} />
         </button>
       )}
@@ -64,14 +61,14 @@ const MultiSelectDropdown: React.FC<Props> = ({ label, options, selected, onChan
           {options.map((option) => (
             <div
               key={option.id}
-              onClick={() => toggleSelection(option.id)}
+              onClick={() => handleSelect(option.id)}
               className={`flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-100 ${
-                selected.includes(option.id) ? "bg-primary/10" : ""
+                selected === option.id ? "bg-primary/10" : ""
               }`}
             >
-              <div className="w-5 h-5 border rounded flex items-center justify-center bg-white">
-                {selected.includes(option.id) && <FiCheck className="text-primary text-sm" />}
-              </div>
+              {selected === option.id && (
+                <FiCheck className="text-primary text-sm" />
+              )}
               <span className="text-sm">{option.label}</span>
             </div>
           ))}
@@ -81,4 +78,4 @@ const MultiSelectDropdown: React.FC<Props> = ({ label, options, selected, onChan
   );
 };
 
-export default MultiSelectDropdown;
+export default SingleSelectDropdown;
