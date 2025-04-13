@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import TagSelector from "../tags/TagSelector";
+import { useDictionaryStore } from "../../store/dictionaryStore";
 
 interface Tag {
   tagId: number;
@@ -9,16 +10,20 @@ interface Tag {
 
 interface TaskCardHeaderProps {
   taskId: number;
-  tags: Tag[];
+  tagIds: number[];
   testNumber?: string;
 }
 
 const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
   taskId,
-  tags: initialTags,
+  tagIds,
   testNumber,
 }) => {
-  const [tags, setTags] = useState<Tag[]>(initialTags);
+  const { taskTags, setTaskTagIds } = useDictionaryStore();
+
+  const fullTags = tagIds
+    .map((id) => taskTags.find((t) => t.tagId === id))
+    .filter((t): t is Tag => Boolean(t));
 
   return (
     <div className="flex justify-between items-start mb-2 gap-2 flex-wrap">
@@ -26,8 +31,10 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
 
       <TagSelector
         taskId={taskId}
-        selectedTags={tags}
-        onTagUpdate={setTags}
+        selectedTags={fullTags}
+        onTagUpdate={(updated) =>
+          setTaskTagIds(taskId, updated.map((t) => t.tagId))
+        }
       />
 
       {testNumber && (

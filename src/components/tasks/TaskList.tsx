@@ -4,7 +4,7 @@ import { AnswerTask } from "../../types/answer";
 
 export interface Task {
   taskId: number;
-  tags: { name: string; color: string }[];
+  tagIds: number[];
   testNumber?: string;
   textContent?: string;
   imageContent?: { imageBase64: string } | null;

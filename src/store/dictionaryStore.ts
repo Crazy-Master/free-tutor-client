@@ -27,11 +27,14 @@ interface DictionaryStore {
   setDisciplines: (d: DisciplineDto[]) => void;
 
   resetDisciplineDependentData: () => void;
-
   loadTaskTags: () => Promise<void>;
+
+  taskMap: Record<number, { tagIds: number[] }>;
+  getTagIds: (taskId: number) => number[];
+  setTaskTagIds: (taskId: number, tagIds: number[]) => void;
 }
 
-export const useDictionaryStore = create<DictionaryStore>((set) => ({
+export const useDictionaryStore = create<DictionaryStore>((set, get) => ({
   taskTags: [],
   topics: [],
   testNumbers: [],
@@ -44,9 +47,9 @@ export const useDictionaryStore = create<DictionaryStore>((set) => ({
   loadedTypeResponses: false,
 
   setTaskTags: (tags) => set({ taskTags: tags, loadedTaskTags: true }),
-  setTopics: (t) => set({ topics: t, loadedTopics: true  }),
-  setTestNumbers: (t) => set({ testNumbers: t, loadedTestNumbers: true   }),
-  setTypeResponses: (t) => set({ typeResponses: t, loadedTopics: true   }),
+  setTopics: (t) => set({ topics: t, loadedTopics: true }),
+  setTestNumbers: (t) => set({ testNumbers: t, loadedTestNumbers: true }),
+  setTypeResponses: (t) => set({ typeResponses: t, loadedTopics: true }),
   setDisciplines: (d) => set({ disciplines: d }),
 
   resetDisciplineDependentData: () =>
@@ -56,9 +59,21 @@ export const useDictionaryStore = create<DictionaryStore>((set) => ({
       loadedTopics: false,
       loadedTestNumbers: false,
     }),
-    
-    loadTaskTags: async () => {
-      const tags = await api.getTaskTags();
-      set({ taskTags: tags, loadedTaskTags: true });
-    },
+
+  loadTaskTags: async () => {
+    const tags = await api.getTaskTags();
+    set({ taskTags: tags, loadedTaskTags: true });
+  },
+
+  taskMap: {},
+
+  getTagIds: (taskId) => get().taskMap[taskId]?.tagIds ?? [],
+
+  setTaskTagIds: (taskId, tagIds) =>
+    set((state) => ({
+      taskMap: {
+        ...state.taskMap,
+        [taskId]: { ...(state.taskMap[taskId] ?? {}), tagIds },
+      },
+    })),
 }));

@@ -1,10 +1,14 @@
 import { TaskDto } from "../types/api-types";
 import { Task } from "../components/tasks/TaskList";
+import { useDictionaryStore } from "../store/dictionaryStore";
 
 export function mapTaskDtoToCardTask(dto: TaskDto): Task {
+  const dictionaryStore = useDictionaryStore.getState();
+  dictionaryStore.setTaskTagIds(dto.taskId, dto.tagIds ?? []);
+
   return {
     taskId: dto.taskId,
-    tags: dto.tagIds?.map(id => ({ name: `#${id}`, color: "#888" })) ?? [],
+    tagIds: dto.tagIds ?? [],
     topics: dto.topicIds?.map(id => `Topic ${id}`) ?? [],
     testNumber: dto.testNumber ?? "",
     textContent: dto.textContent,
