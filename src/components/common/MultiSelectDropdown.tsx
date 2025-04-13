@@ -38,14 +38,14 @@ const MultiSelectDropdown: React.FC<Props> = ({ label, options, selected, onChan
     }
   };
 
-  const isEmpty = options.length === 1 && options[0].disabled;
-
+  const isEmpty = options.length === 0 || (options.length === 1 && options[0].disabled);
+  
   return (
     <div className="relative w-full mb-4" ref={ref}>
       <label className="block mb-1 text-sm font-medium">{label}</label>
 
       {isEmpty ? (
-        <div className="text-gray-400 px-3 py-2 border rounded bg-gray-50 cursor-not-allowed select-none">
+        <div className="text-gray-400 px-3 py-2 border rounded bg-gray-50 select-none">
           список отсутствует
         </div>
       ) : (

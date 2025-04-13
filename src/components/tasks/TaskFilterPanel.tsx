@@ -12,8 +12,8 @@ interface Props {
 }
 
 const TaskFilterPanel: React.FC<Props> = ({ onSearch, onReset }) => {
-  const userInfo = useUserInfoFromToken()
-  
+  const userInfo = useUserInfoFromToken();
+
   const [taskId, setTaskId] = useState("");
   const [taskIdExternal, setTaskIdExternal] = useState("");
   const [typeResponseId, setTypeResponseId] = useState<number | null>(null);
@@ -60,7 +60,6 @@ const TaskFilterPanel: React.FC<Props> = ({ onSearch, onReset }) => {
     if (!loadedTypeResponses && typeResponses.length === 0) {
       api.getTypeResponses().then(setTypeResponses);
     }
-
   }, [
     userInfo,
     disciplineId,
@@ -115,7 +114,7 @@ const TaskFilterPanel: React.FC<Props> = ({ onSearch, onReset }) => {
           <MultiSelectDropdown
             label="Теги"
             options={
-              tagsLoaded && taskTags.length === 0
+              loadedTaskTags && taskTags.length === 0
                 ? [
                     {
                       id: -1,
@@ -130,24 +129,24 @@ const TaskFilterPanel: React.FC<Props> = ({ onSearch, onReset }) => {
                   }))
             }
             selected={tagIds}
-            onChange={setTagIds}
+            onChange={(ids) => setTagIds(ids.filter((id) => id !== -1))}
           />
 
           <MultiSelectDropdown
             label="Темы"
             options={
-              topicsLoaded && topics.length === 0
+              loadedTopics && topics.length === 0
                 ? [{ id: -1, label: "отсутствует список тем", disabled: true }]
                 : topics.map((t) => ({ id: t.topicId, label: t.topic }))
             }
             selected={topicIds}
-            onChange={setTopicIds}
+            onChange={(ids) => setTopicIds(ids.filter((id) => id !== -1))}
           />
 
           <MultiSelectDropdown
             label="Номера в тесте"
             options={
-              numbersLoaded && testNumbers.length === 0
+              loadedTestNumbers && testNumbers.length === 0
                 ? [
                     {
                       id: -1,
@@ -157,17 +156,17 @@ const TaskFilterPanel: React.FC<Props> = ({ onSearch, onReset }) => {
                   ]
                 : testNumbers.map((n) => ({
                     id: n.testNumberId,
-                    label: `${n.number} ${n.name ?? ""}`,
+                    label: `${n.number}${n.name ? ` – ${n.name}` : ""}`,
                   }))
             }
             selected={testNumberIds}
-            onChange={setTestNumberIds}
+            onChange={(ids) => setTestNumberIds(ids.filter((id) => id !== -1))}
           />
 
           <SingleSelectDropdown
             label="Тип ответа"
             options={
-              typesLoaded && typeResponses.length === 0
+              loadedTypeResponses && typeResponses.length === 0
                 ? [
                     {
                       id: -1,
@@ -181,7 +180,7 @@ const TaskFilterPanel: React.FC<Props> = ({ onSearch, onReset }) => {
                   }))
             }
             selected={typeResponseId}
-            onChange={setTypeResponseId}
+            onChange={(id) => setTypeResponseId(id === -1 ? null : id)}
           />
 
           <div className="flex flex-wrap gap-4">

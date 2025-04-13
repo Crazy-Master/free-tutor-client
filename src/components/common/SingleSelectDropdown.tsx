@@ -15,7 +15,12 @@ interface Props {
   placeholder?: string;
 }
 
-const SingleSelectDropdown: React.FC<Props> = ({ label, options, selected, onChange }) => {
+const SingleSelectDropdown: React.FC<Props> = ({
+  label,
+  options,
+  selected,
+  onChange,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -34,8 +39,10 @@ const SingleSelectDropdown: React.FC<Props> = ({ label, options, selected, onCha
     setIsOpen(false);
   };
 
-  const selectedLabel = options.find((o) => o.id === selected)?.label ?? "Выбор";
-  const isEmpty = options.length === 1 && options[0].disabled;
+  const selectedLabel =
+    options.find((o) => o.id === selected)?.label ?? "Выбор";
+  const isEmpty =
+    options.length === 0 || (options.length === 1 && options[0].disabled);
 
   return (
     <div className="relative w-full mb-4" ref={ref}>
@@ -52,7 +59,9 @@ const SingleSelectDropdown: React.FC<Props> = ({ label, options, selected, onCha
           className="w-full text-left px-3 py-2 border rounded bg-white text-black flex justify-between items-center"
         >
           {selectedLabel}
-          <FiChevronDown className={`ml-2 transform ${isOpen ? "rotate-180" : ""}`} />
+          <FiChevronDown
+            className={`ml-2 transform ${isOpen ? "rotate-180" : ""}`}
+          />
         </button>
       )}
 
