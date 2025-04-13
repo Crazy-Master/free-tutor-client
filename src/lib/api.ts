@@ -96,17 +96,26 @@ export const api = {
     });
   },
   
-  getTaskTags: (userId?: number) =>
-    request<TaskTagDto[]>(`/api/task-tags${userId ? `?userId=${userId}` : ""}`),
+  getTaskTags: (userId?: number) =>{
+    console.log("[API CALL] GET /api/task-tags?userId=", userId);
+    return request<TaskTagDto[]>(`/api/task-tags${userId ? `?userId=${userId}` : ""}`)
+  },
+    
   
-  getTopics: (disciplineId?: number) =>
-    request<TopicDto[]>(`/api/topics${disciplineId ? `?disciplineId=${disciplineId}` : ""}`),
+  getTopics: (disciplineId?: number) =>{
+    console.log("[API CALL] GET /api/topics?disciplineId=", disciplineId);
+    return request<TopicDto[]>(`/api/topics${disciplineId ? `?disciplineId=${disciplineId}` : ""}`)},
   
-  getTestNumbers: (disciplineId?: number) =>
-    request<TestNumberDto[]>(`/api/test-numbers${disciplineId ? `?disciplineId=${disciplineId}` : ""}`),
+  getTestNumbers: (disciplineId?: number) =>{
+    console.log("[API CALL] GET /api/test-numbers?disciplineId=", disciplineId);
+    return request<TestNumberDto[]>(`/api/test-numbers${disciplineId ? `?disciplineId=${disciplineId}` : ""}`)
+  },
+    
   
-  getTypeResponses: () =>
-    request<TypeResponseDto[]>("/api/type-responses"),
+  getTypeResponses: () =>{
+    console.log("[API CALL] GET /api/type-responses");
+    return request<TypeResponseDto[]>("/api/type-responses")
+  },
 
   updateUserInfo: (info: UserInfoDto) => request<void>("/api/users/information", "PUT", info),
 };

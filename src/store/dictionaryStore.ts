@@ -40,10 +40,10 @@ export const useDictionaryStore = create<DictionaryStore>((set) => ({
   loadedTestNumbers: false,
   loadedTypeResponses: false,
 
-  setTaskTags: (tags) => set({ taskTags: tags }),
-  setTopics: (t) => set({ topics: t }),
-  setTestNumbers: (t) => set({ testNumbers: t }),
-  setTypeResponses: (t) => set({ typeResponses: t }),
+  setTaskTags: (tags) => set({ taskTags: tags, loadedTaskTags: true }),
+  setTopics: (t) => set({ topics: t, loadedTopics: true  }),
+  setTestNumbers: (t) => set({ testNumbers: t, loadedTestNumbers: true   }),
+  setTypeResponses: (t) => set({ typeResponses: t, loadedTypeResponses: true   }),
   setDisciplines: (d) => set({ disciplines: d }),
 
   resetDisciplineDependentData: () =>

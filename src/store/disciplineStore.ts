@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { useDictionaryStore } from "./dictionaryStore";
+import { dictionaryService } from "../services/dictionaryService";
 
 
 interface DisciplineStore {
@@ -15,6 +16,7 @@ interface DisciplineStore {
       localStorage.setItem("selectedDisciplineId", id.toString());
       set({ disciplineId: id });
   
+      dictionaryService.reset();
       useDictionaryStore.getState().resetDisciplineDependentData();
     },
   

@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useUserInfoFromToken } from "../../hooks/useUserInfoFromToken";
-import { api } from "../../lib/api";
 import MultiSelectDropdown from "../common/MultiSelectDropdown";
 import SingleSelectDropdown from "../common/SingleSelectDropdown";
 import { useDictionaryStore } from "../../store/dictionaryStore";
 import { TaskFilterDto } from "../../types/api-types";
+import { useLoadDictionaries } from "../../hooks/useLoadDictionaries";
 
 interface Props {
   onSearch: (dto: TaskFilterDto) => void;
@@ -20,7 +20,6 @@ const TaskFilterPanel: React.FC<Props> = ({ onSearch, onReset }) => {
   const [tagIds, setTagIds] = useState<number[]>([]);
   const [topicIds, setTopicIds] = useState<number[]>([]);
   const [testNumberIds, setTestNumberIds] = useState<number[]>([]);
-
   const [expanded, setExpanded] = useState(false);
 
   const {
@@ -32,50 +31,13 @@ const TaskFilterPanel: React.FC<Props> = ({ onSearch, onReset }) => {
     loadedTopics,
     loadedTestNumbers,
     loadedTypeResponses,
-    setTaskTags,
-    setTopics,
-    setTestNumbers,
-    setTypeResponses,
   } = useDictionaryStore();
 
   const disciplineId = localStorage.getItem("selectedDisciplineId")
     ? parseInt(localStorage.getItem("selectedDisciplineId")!)
     : 0;
 
-  useEffect(() => {
-    if (!userInfo || !disciplineId) return;
-
-    if (!loadedTaskTags && taskTags.length === 0) {
-      api.getTaskTags(userInfo.userId).then(setTaskTags);
-    }
-
-    if (!loadedTopics && topics.length === 0) {
-      api.getTopics(disciplineId).then(setTopics);
-    }
-
-    if (!loadedTestNumbers && testNumbers.length === 0) {
-      api.getTestNumbers(disciplineId).then(setTestNumbers);
-    }
-
-    if (!loadedTypeResponses && typeResponses.length === 0) {
-      api.getTypeResponses().then(setTypeResponses);
-    }
-  }, [
-    userInfo,
-    disciplineId,
-    taskTags,
-    topics,
-    testNumbers,
-    typeResponses,
-    loadedTaskTags,
-    loadedTopics,
-    loadedTestNumbers,
-    loadedTypeResponses,
-    setTaskTags,
-    setTopics,
-    setTestNumbers,
-    setTypeResponses,
-  ]);
+  useLoadDictionaries(userInfo?.userId, disciplineId);
 
   const handleSearch = () => {
     onSearch({
@@ -115,13 +77,7 @@ const TaskFilterPanel: React.FC<Props> = ({ onSearch, onReset }) => {
             label="Теги"
             options={
               loadedTaskTags && taskTags.length === 0
-                ? [
-                    {
-                      id: -1,
-                      label: "отсутствует список тегов",
-                      disabled: true,
-                    },
-                  ]
+                ? [{ id: -1, label: "отсутствует список тегов", disabled: true }]
                 : taskTags.map((t) => ({
                     id: t.tagId,
                     label: t.name,
@@ -147,13 +103,7 @@ const TaskFilterPanel: React.FC<Props> = ({ onSearch, onReset }) => {
             label="Номера в тесте"
             options={
               loadedTestNumbers && testNumbers.length === 0
-                ? [
-                    {
-                      id: -1,
-                      label: "отсутствует список номеров",
-                      disabled: true,
-                    },
-                  ]
+                ? [{ id: -1, label: "отсутствует список номеров", disabled: true }]
                 : testNumbers.map((n) => ({
                     id: n.testNumberId,
                     label: `${n.number}${n.name ? ` – ${n.name}` : ""}`,
@@ -167,13 +117,7 @@ const TaskFilterPanel: React.FC<Props> = ({ onSearch, onReset }) => {
             label="Тип ответа"
             options={
               loadedTypeResponses && typeResponses.length === 0
-                ? [
-                    {
-                      id: -1,
-                      label: "отсутствует список вариантов ответов",
-                      disabled: true,
-                    },
-                  ]
+                ? [{ id: -1, label: "отсутствует список вариантов ответов", disabled: true }]
                 : typeResponses.map((t) => ({
                     id: t.typeResponseId,
                     label: t.nameResponse,
@@ -185,9 +129,7 @@ const TaskFilterPanel: React.FC<Props> = ({ onSearch, onReset }) => {
 
           <div className="flex flex-wrap gap-4">
             <div className="flex flex-col max-w-[300px] w-full">
-              <label className="mb-1 text-sm text-gray-700">
-                Номер на сайте
-              </label>
+              <label className="mb-1 text-sm text-gray-700">Номер на сайте</label>
               <input
                 type="number"
                 placeholder="Введите ID"
@@ -198,9 +140,7 @@ const TaskFilterPanel: React.FC<Props> = ({ onSearch, onReset }) => {
             </div>
 
             <div className="flex flex-col max-w-[300px] w-full">
-              <label className="mb-1 text-sm text-gray-700">
-                Номер на ФИПИ
-              </label>
+              <label className="mb-1 text-sm text-gray-700">Номер на ФИПИ</label>
               <input
                 type="text"
                 placeholder="Например: 10A"
