@@ -6,6 +6,7 @@ import {
   TypeResponseDto,
   DisciplineDto,
 } from "../types/api-types";
+import { api } from "../lib/api";
 
 interface DictionaryStore {
   taskTags: TaskTagDto[];
@@ -26,6 +27,8 @@ interface DictionaryStore {
   setDisciplines: (d: DisciplineDto[]) => void;
 
   resetDisciplineDependentData: () => void;
+
+  loadTaskTags: () => Promise<void>;
 }
 
 export const useDictionaryStore = create<DictionaryStore>((set) => ({
@@ -43,7 +46,7 @@ export const useDictionaryStore = create<DictionaryStore>((set) => ({
   setTaskTags: (tags) => set({ taskTags: tags, loadedTaskTags: true }),
   setTopics: (t) => set({ topics: t, loadedTopics: true  }),
   setTestNumbers: (t) => set({ testNumbers: t, loadedTestNumbers: true   }),
-  setTypeResponses: (t) => set({ typeResponses: t, loadedTypeResponses: true   }),
+  setTypeResponses: (t) => set({ typeResponses: t, loadedTopics: true   }),
   setDisciplines: (d) => set({ disciplines: d }),
 
   resetDisciplineDependentData: () =>
@@ -53,4 +56,9 @@ export const useDictionaryStore = create<DictionaryStore>((set) => ({
       loadedTopics: false,
       loadedTestNumbers: false,
     }),
+    
+    loadTaskTags: async () => {
+      const tags = await api.getTaskTags();
+      set({ taskTags: tags, loadedTaskTags: true });
+    },
 }));
