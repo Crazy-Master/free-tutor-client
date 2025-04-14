@@ -9,6 +9,7 @@ import { useDictionaryStore } from "../../store/dictionaryStore";
 
 interface TaskCardBaseProps {
   taskId: number;
+  taskIdExternal: string;
   testNumber?: string;
   textContent?: string;
   imageContent?: { imageBase64: string } | null;
@@ -18,20 +19,21 @@ interface TaskCardBaseProps {
   answerType: string;
   groupNumber?: number;
   year: number;
+  resource?: string;
   relevance: string;
 }
 
 const TaskCardBase: React.FC<TaskCardBaseProps> = ({
   taskId,
+  taskIdExternal,
   testNumber,
   textContent,
   imageContent,
   shortAnswer,
   answerTask,
-  topics,
-  answerType,
   groupNumber,
   year,
+  resource,
   relevance,
 }) => {
   const [showSolution, setShowSolution] = useState(false);
@@ -62,12 +64,14 @@ const TaskCardBase: React.FC<TaskCardBaseProps> = ({
 
         {showSolution && <SolutionViewer answer={answerTask ?? null} />}
 
+
         <TaskCardFooter
-          topics={topics}
-          answerType={answerType}
+          taskId={taskId}
           groupNumber={groupNumber}
           year={year}
           relevance={relevance}
+          resource={resource}
+          taskIdExternal={taskIdExternal}
         />
       </div>
     </div>

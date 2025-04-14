@@ -5,7 +5,7 @@ import {
   StudentCardInfoDto,
   StudentToTeacherDto,
 } from "../types/api-types";
-import { TaskFilterDto } from "../types/api-types";
+import { PagedResultDto, TaskDto, TaskFilterDto } from "../types/api-types";
 import {
   TaskTagDto,
   TopicDto,
@@ -65,46 +65,52 @@ export const api = {
   deleteStudentLink: (id: number) =>
     request<void>(`/api/student-to-teacher/teacher/${id}`, "DELETE"),
 
-  getTasks: (filter: TaskFilterDto) => {
+  getTasks: async (filter: TaskFilterDto): Promise<PagedResultDto<TaskDto>> => {
     const query = new URLSearchParams();
-
+  
     if (filter.tagIds?.length)
       filter.tagIds.forEach((id) => query.append("tagIds", id.toString()));
-
+  
     if (filter.topicIds?.length)
       filter.topicIds.forEach((id) => query.append("topicIds", id.toString()));
-
+  
     if (filter.testNumberIds?.length)
       filter.testNumberIds.forEach((id) =>
         query.append("testNumberIds", id.toString())
       );
-
+  
     if (filter.typeResponseId !== undefined)
       query.append("typeResponseId", filter.typeResponseId.toString());
-
+  
     if (filter.taskId !== undefined)
       query.append("taskId", filter.taskId.toString());
-
+  
     if (filter.taskIdExternal)
       query.append("taskIdExternal", filter.taskIdExternal);
-
+  
     if (filter.pageNumber)
       query.append("pageNumber", filter.pageNumber.toString());
-
-    if (filter.pageSize) query.append("pageSize", filter.pageSize.toString());
-
-    return fetch(`https://api-tutor-master.ru/api/tasks?${query.toString()}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    }).then((res) => {
-      if (!res.ok) {
-        throw new Error("Ошибка загрузки задач");
+  
+    if (filter.pageSize)
+      query.append("pageSize", filter.pageSize.toString());
+  
+    const res = await fetch(
+      `https://api-tutor-master.ru/api/tasks?${query.toString()}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       }
-      return res.json();
-    });
+    );
+  
+    if (!res.ok) {
+      throw new Error("Ошибка загрузки задач");
+    }
+  
+    const data: PagedResultDto<TaskDto> = await res.json();
+    return data;
   },
 
   getTaskTags: (userId?: number) => {
@@ -158,4 +164,20 @@ export const api = {
       tagId,
     });
   },
+
+  getTopicNamesByTaskId: (taskId: number) =>
+    request<string[]>(`/api/topics/by-task/${taskId}`),
+  
+  getTypeResponseNameByTaskId: async (taskId: number) => {
+    const res = await fetch(`${BASE_URL}/api/type-responses/by-task/${taskId}`, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
+  
+    if (!res.ok) throw new Error(await res.text() || "Ошибка API");
+  
+    return res.text();
+  },
+  
 };

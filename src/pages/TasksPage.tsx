@@ -50,6 +50,7 @@ const TasksPage: React.FC = () => {
     const updatedFilter = { ...filter, pageNumber: page };
     setFilter(updatedFilter);
     fetchTasks(updatedFilter);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (

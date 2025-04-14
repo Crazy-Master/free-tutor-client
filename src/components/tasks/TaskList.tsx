@@ -15,6 +15,8 @@ export interface Task {
   groupNumber?: number;
   year: number;
   relevance: string;
+  resource?: string;
+  taskIdExternal: string;
 }
 
 interface TaskListProps {

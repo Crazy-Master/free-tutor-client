@@ -9,7 +9,7 @@ export function mapTaskDtoToCardTask(dto: TaskDto): Task {
   return {
     taskId: dto.taskId,
     tagIds: dto.tagIds ?? [],
-    topics: dto.topicIds?.map(id => `Topic ${id}`) ?? [],
+    topics: dto.topicIds?.map((id) => `Topic ${id}`) ?? [],
     testNumber: dto.testNumber ?? "",
     textContent: dto.textContent,
     imageContent: dto.imageContent,
@@ -19,5 +19,7 @@ export function mapTaskDtoToCardTask(dto: TaskDto): Task {
     groupNumber: dto.groupNumber,
     year: dto.year ? parseInt(dto.year) : 0,
     relevance: dto.relevance ? "актуально" : "неактуально",
+    resource: dto.resource,
+    taskIdExternal: dto.taskIdExternal,
   };
 }
