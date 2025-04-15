@@ -16,7 +16,12 @@ interface Props {
   placeholder?: string;
 }
 
-const MultiSelectDropdown: React.FC<Props> = ({ label, options, selected, onChange }) => {
+const MultiSelectDropdown: React.FC<Props> = ({
+  label,
+  options,
+  selected,
+  onChange,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -38,11 +43,12 @@ const MultiSelectDropdown: React.FC<Props> = ({ label, options, selected, onChan
     }
   };
 
-  const isEmpty = options.length === 0 || (options.length === 1 && options[0].disabled);
-  
+  const isEmpty =
+    options.length === 0 || (options.length === 1 && options[0].disabled);
+
   return (
     <div className="relative w-full mb-4" ref={ref}>
-      <label className="block mb-1 text-sm font-medium">{label}</label>
+      <label className="block mb-1 text-md font-medium">{label}</label>
 
       {isEmpty ? (
         <div className="text-gray-400 px-3 py-2 border rounded bg-gray-50 select-none">
@@ -55,7 +61,9 @@ const MultiSelectDropdown: React.FC<Props> = ({ label, options, selected, onChan
           className="w-full text-left px-3 py-2 border rounded bg-white text-black flex justify-between items-center"
         >
           Выбор
-          <FiChevronDown className={`ml-2 transform ${isOpen ? "rotate-180" : ""}`} />
+          <FiChevronDown
+            className={`ml-2 transform ${isOpen ? "rotate-180" : ""}`}
+          />
         </button>
       )}
 
@@ -65,14 +73,16 @@ const MultiSelectDropdown: React.FC<Props> = ({ label, options, selected, onChan
             <div
               key={option.id}
               onClick={() => toggleSelection(option.id)}
-              className={`flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-100 ${
+              className={`flex items-start gap-2 px-3 py-2 cursor-pointer hover:bg-gray-100 ${
                 selected.includes(option.id) ? "bg-primary/10" : ""
               }`}
             >
-              <div className="w-5 h-5 border rounded flex items-center justify-center bg-white">
-                {selected.includes(option.id) && <FiCheck className="text-primary text-sm" />}
+              <div className="min-w-[20px] w-5 h-5 border rounded flex items-center justify-center bg-white">
+                {selected.includes(option.id) && (
+                  <FiCheck className="text-primary text-md" />
+                )}
               </div>
-              <span className="text-sm">{option.label}</span>
+              <span className="text-md">{option.label}</span>
             </div>
           ))}
         </div>

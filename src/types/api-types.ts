@@ -110,3 +110,9 @@ export interface UpdateShortAnswerDto {
   taskId: number;
   shortAnswer: number;
 }
+
+export interface UpdateGroupNumberDto {
+  taskId: number;
+  groupNumber: number;
+}
+

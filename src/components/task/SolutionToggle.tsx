@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { AnswerTask } from "../../types/answer";
 import ExpandedSolutionViewer from "./ExpandedSolutionViewer";
-import EditShortAnswerModal from "./EditShortAnswerModal";
+import { api } from "../../lib/api";
+import EditFieldModal from "./EditFieldModal";
 
 interface SolutionToggleProps {
   answer: AnswerTask | null;
@@ -36,7 +37,7 @@ const SolutionToggle: React.FC<SolutionToggleProps> = ({ answer, taskId }) => {
 
           <button
             className="text-blue-600 underline hover:text-blue-800"
-            onClick={() => setShowEditModal(!showEditModal)}
+            onClick={() => setShowEditModal(true)}
           >
             Изменить ответ
           </button>
@@ -57,11 +58,18 @@ const SolutionToggle: React.FC<SolutionToggleProps> = ({ answer, taskId }) => {
       {expanded && <ExpandedSolutionViewer answer={answer} />}
 
       {showEditModal && taskId !== undefined && (
-        <EditShortAnswerModal
-          taskId={taskId}
-          initialValue={shortAnswerState}
+        <EditFieldModal
+          title="Изменить краткий ответ"
+          label="Краткий ответ"
+          initialValue={shortAnswerState ?? ""}
+          inputType="number"
           onClose={() => setShowEditModal(false)}
-          onSave={(val) => setShortAnswerState(val)}
+          onSubmit={async (val) => {
+            const parsed = parseFloat(val);
+            if (isNaN(parsed)) throw new Error("Некорректный ответ");
+            await api.updateShortAnswer({ taskId, shortAnswer: parsed });
+            setShortAnswerState(parsed);
+          }}
         />
       )}
     </div>

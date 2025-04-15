@@ -46,7 +46,7 @@ const SingleSelectDropdown: React.FC<Props> = ({
 
   return (
     <div className="relative w-full mb-4" ref={ref}>
-      <label className="block mb-1 text-sm font-medium">{label}</label>
+      <label className="block mb-1 text-md font-medium">{label}</label>
 
       {isEmpty ? (
         <div className="text-gray-400 px-3 py-2 border rounded bg-gray-50 cursor-not-allowed select-none">
@@ -65,8 +65,20 @@ const SingleSelectDropdown: React.FC<Props> = ({
         </button>
       )}
 
-      {isOpen && !isEmpty && (
-        <div className="absolute left-0 mt-1 w-full bg-white border rounded shadow z-10 max-h-60 overflow-y-auto">
+      {isOpen && (
+        <div className="absolute top-full left-0 mt-1 w-full border bg-white z-10 rounded shadow-md max-h-60 overflow-y-auto">
+          {/* Дополнительный пункт для сброса */}
+          <div
+            onClick={() => handleSelect(-1)}
+            className={`flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-100 ${
+              selected === null ? "bg-primary/10" : ""
+            }`}
+          >
+            {selected === null && <FiCheck className="text-primary text-md" />}
+            <span className="text-md text-gray-500 italic">Не выбрано</span>
+          </div>
+
+          {/* Остальные реальные опции */}
           {options.map((option) => (
             <div
               key={option.id}
@@ -76,13 +88,15 @@ const SingleSelectDropdown: React.FC<Props> = ({
               }`}
             >
               {selected === option.id && (
-                <FiCheck className="text-primary text-sm" />
+                <FiCheck className="text-primary text-md" />
               )}
-              <span className="text-sm">{option.label}</span>
+              <span className="text-md">{option.label}</span>
             </div>
           ))}
         </div>
       )}
+
+      
     </div>
   );
 };

@@ -1,20 +1,23 @@
-import React, { useState, useEffect, useRef } from "react";
-import { api } from "../../lib/api";
+import React, { useEffect, useRef, useState } from "react";
 
-interface EditShortAnswerModalProps {
-  taskId: number;
-  initialValue: number | null;
+interface EditFieldModalProps {
+  title: string;
+  label: string;
+  initialValue: string | number;
+  inputType?: "text" | "number";
   onClose: () => void;
-  onSave?: (newValue: number) => void;
+  onSubmit: (newValue: string) => Promise<void>;
 }
 
-const EditShortAnswerModal: React.FC<EditShortAnswerModalProps> = ({
-  taskId,
+const EditFieldModal: React.FC<EditFieldModalProps> = ({
+  title,
+  label,
   initialValue,
+  inputType = "text",
   onClose,
-  onSave,
+  onSubmit,
 }) => {
-  const [value, setValue] = useState<string>(initialValue?.toString() || "");
+  const [value, setValue] = useState<string>(initialValue.toString());
   const [loading, setLoading] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -24,10 +27,10 @@ const EditShortAnswerModal: React.FC<EditShortAnswerModalProps> = ({
       if (e.key === "Escape") onClose();
     };
 
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (e: MouseEvent) => {
       if (
         modalRef.current &&
-        !modalRef.current.contains(event.target as Node)
+        !modalRef.current.contains(e.target as Node)
       ) {
         onClose();
       }
@@ -42,20 +45,18 @@ const EditShortAnswerModal: React.FC<EditShortAnswerModalProps> = ({
   }, [onClose]);
 
   const handleSubmit = async () => {
-    const parsed = parseFloat(value);
-    if (isNaN(parsed)) {
-      alert("Введите корректное число");
+    if (!value.trim()) {
+      alert("Поле не должно быть пустым");
       return;
     }
 
     setLoading(true);
     try {
-      await api.updateShortAnswer({ taskId, shortAnswer: parsed });
-      onSave?.(parsed);
+      await onSubmit(value);
       onClose();
     } catch (err) {
-      console.error("Ошибка обновления краткого ответа:", err);
-      alert("Не удалось обновить ответ");
+      console.error("Ошибка при обновлении:", err);
+      alert("Не удалось сохранить изменения");
     } finally {
       setLoading(false);
     }
@@ -67,11 +68,11 @@ const EditShortAnswerModal: React.FC<EditShortAnswerModalProps> = ({
         ref={modalRef}
         className="bg-white dark:bg-gray-800 p-6 rounded shadow-md w-[90%] max-w-md"
       >
-        <h2 className="text-lg font-semibold mb-4">Изменить краткий ответ</h2>
+        <h2 className="text-lg font-semibold mb-4">{title}</h2>
 
+        <label className="block text-sm font-medium mb-1">{label}</label>
         <input
-          type="number"
-          step="any"
+          type={inputType}
           className="w-full p-2 border rounded mb-4 text-black dark:text-white"
           value={value}
           onChange={(e) => setValue(e.target.value)}
@@ -98,4 +99,4 @@ const EditShortAnswerModal: React.FC<EditShortAnswerModalProps> = ({
   );
 };
 
-export default EditShortAnswerModal;
+export default EditFieldModal;

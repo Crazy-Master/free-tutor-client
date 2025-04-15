@@ -153,7 +153,10 @@ const TaskFilterPanel: React.FC<Props> = ({ onSearch, onReset }) => {
 
           <div className="flex gap-4 mt-2">
             <button
-              onClick={handleSearch}
+              onClick={() => {
+                handleSearch();
+                setExpanded(false);
+              }}
               className="px-4 py-2 bg-primary text-white rounded hover:opacity-90"
             >
               Найти
