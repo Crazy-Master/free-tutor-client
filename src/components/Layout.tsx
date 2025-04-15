@@ -2,9 +2,19 @@
 import React from "react";
 import Header from "./Header";
 import { Outlet } from "react-router-dom";
+import { useEffect } from "react";
+import { useUiStore } from "../store/uiStore";
 
 const Layout: React.FC = () => {
-  
+  const setWindowWidth = useUiStore((s) => s.setWindowWidth);
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [setWindowWidth]);  
 
   return (
     <div className="min-h-screen flex flex-col">

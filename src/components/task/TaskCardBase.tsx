@@ -13,7 +13,6 @@ interface TaskCardBaseProps {
   testNumber?: string;
   textContent?: string;
   imageContent?: { imageBase64: string } | null;
-  shortAnswer?: number;
   answerTask?: AnswerTask | null;
   topics: string[];
   answerType: string;
@@ -29,7 +28,6 @@ const TaskCardBase: React.FC<TaskCardBaseProps> = ({
   testNumber,
   textContent,
   imageContent,
-  shortAnswer,
   answerTask,
   groupNumber,
   year,
@@ -58,7 +56,8 @@ const TaskCardBase: React.FC<TaskCardBaseProps> = ({
         </div>
 
         <SolutionToggle
-          answer={{ ...answerTask, shortAnswer }}
+          answer={{ ...answerTask }}
+          taskId={taskId}
           onExpand={() => setShowSolution((prev) => !prev)}
         />
 

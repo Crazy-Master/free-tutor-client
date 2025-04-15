@@ -1,29 +1,29 @@
 export interface DisciplineDto {
-    disciplineId: number;
-    discipline: string;
-    typeExam: string;
-  }
-  
-  export interface StudentCardInfoDto {
-    id: number;
-    studentId: number;
-    login: string;
-    lastActiveAt: string | null;
-  }
-  
-  export interface StudentToTeacherDto {
-    id?: number;
-    studentId: number;
-    teacherId: number;
-    disciplineId: number;
-    information: StudentInfoDto;
-  }
-  
-  export interface StudentInfoDto {
-    notes?: Record<number, string>;
-  }
+  disciplineId: number;
+  discipline: string;
+  typeExam: string;
+}
 
-  export interface TaskFilterDto {
+export interface StudentCardInfoDto {
+  id: number;
+  studentId: number;
+  login: string;
+  lastActiveAt: string | null;
+}
+
+export interface StudentToTeacherDto {
+  id?: number;
+  studentId: number;
+  teacherId: number;
+  disciplineId: number;
+  information: StudentInfoDto;
+}
+
+export interface StudentInfoDto {
+  notes?: Record<number, string>;
+}
+
+export interface TaskFilterDto {
   tagIds?: number[];
   topicIds?: number[];
   testNumberIds?: number[];
@@ -44,7 +44,7 @@ export interface TaskFilterDto {
   pageNumber: number;
   pageSize: number;
 }
-  
+
 export interface ImageData {
   imageBase64: string;
 }
@@ -104,4 +104,9 @@ export interface TestNumberDto {
 export interface TypeResponseDto {
   typeResponseId: number;
   nameResponse: string;
+}
+
+export interface UpdateShortAnswerDto {
+  taskId: number;
+  shortAnswer: number;
 }

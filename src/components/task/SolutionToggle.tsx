@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { AnswerTask } from "../../types/answer";
+import ExpandedSolutionViewer from "./ExpandedSolutionViewer";
+import EditShortAnswerModal from "./EditShortAnswerModal";
 
 interface SolutionToggleProps {
   answer: AnswerTask | null;
-  onExpand: () => void;
+  taskId?: number;
+  onExpand?: () => void;
 }
 
 const hasDetailedSolution = (answer: AnswerTask | null): boolean => {
@@ -15,23 +18,51 @@ const hasDetailedSolution = (answer: AnswerTask | null): boolean => {
   );
 };
 
-const SolutionToggle: React.FC<SolutionToggleProps> = ({ answer, onExpand }) => {
+const SolutionToggle: React.FC<SolutionToggleProps> = ({ answer, taskId }) => {
+  const [expanded, setExpanded] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [shortAnswerState, setShortAnswerState] = useState<number | null>(
+    answer?.shortAnswer ?? null
+  );
+
   return (
-    <div className="flex justify-between items-center mt-2 text-sm">
-      <div>
-        <span className="font-medium">Ответ: </span>
-        {answer?.shortAnswer !== undefined && answer?.shortAnswer !== null
-          ? answer.shortAnswer
-          : "—"}
+    <div className="max-w-[800px] mx-auto mt-4">
+      <div className="flex justify-between items-center text-md mb-2">
+        <div className="flex items-center gap-4">
+          <div>
+            <span className="font-medium">Ответ: </span>
+            {shortAnswerState !== null ? shortAnswerState : "отсутствует"}
+          </div>
+
+          <button
+            className="text-blue-600 underline hover:text-blue-800"
+            onClick={() => setShowEditModal(!showEditModal)}
+          >
+            Изменить ответ
+          </button>
+        </div>
+
+        {hasDetailedSolution(answer) && (
+          <div className="flex-1 text-center">
+            <button
+              onClick={() => setExpanded(!expanded)}
+              className="text-blue-600 underline hover:text-blue-800"
+            >
+              {expanded ? "Скрыть развёрнутый ответ" : "Развёрнутый ответ"}
+            </button>
+          </div>
+        )}
       </div>
 
-      {hasDetailedSolution(answer) && (
-        <button
-          onClick={onExpand}
-          className="text-blue-600 underline hover:text-blue-800"
-        >
-          Развёрнутый ответ
-        </button>
+      {expanded && <ExpandedSolutionViewer answer={answer} />}
+
+      {showEditModal && taskId !== undefined && (
+        <EditShortAnswerModal
+          taskId={taskId}
+          initialValue={shortAnswerState}
+          onClose={() => setShowEditModal(false)}
+          onSave={(val) => setShortAnswerState(val)}
+        />
       )}
     </div>
   );

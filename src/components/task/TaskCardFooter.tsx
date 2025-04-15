@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { api } from "../../lib/api";
+import { useUiStore } from "../../store/uiStore";
 
 interface Props {
   taskId: number;
@@ -22,6 +23,7 @@ const TaskCardFooter: React.FC<Props> = ({
   const [answerType, setAnswerType] = useState<string>("");
 
   const [isHovering, setIsHovering] = useState(false);
+  const windowWidth = useUiStore((s) => s.windowWidth);
 
   useEffect(() => {
     const fetchInfo = async () => {
@@ -54,7 +56,12 @@ const TaskCardFooter: React.FC<Props> = ({
         </div>
 
         {isHovering && (
-          <div className="max-w-[925px] mx-auto absolute left-0 bottom-0 z-10 bg-white dark:bg-gray-800 border shadow-md p-3 rounded w-max text-xs text-left">
+          <div
+            //className="max-w-[925px] mx-auto absolute left-0 bottom-0 z-10 bg-white dark:bg-gray-800 border shadow-md p-3 rounded w-max text-xs text-left"
+            //className="absolute left-0 bottom-0 z-10 bg-white dark:bg-gray-800 border shadow-md p-3 rounded w-max text-xs text-left"
+            className="overflow-x-auto absolute left-0 bottom-0 z-10 bg-white dark:bg-gray-800 border shadow-md p-3 rounded w-max text-xs text-left"
+            style={{width: `${Math.min(windowWidth * 0.7, 925)}px`,}}
+          >
             <div>
               <strong>📘 Темы:</strong>
               <ul className="list-disc ml-4">

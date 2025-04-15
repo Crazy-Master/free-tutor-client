@@ -4,6 +4,7 @@ import {
   DisciplineDto,
   StudentCardInfoDto,
   StudentToTeacherDto,
+  UpdateShortAnswerDto,
 } from "../types/api-types";
 import { PagedResultDto, TaskDto, TaskFilterDto } from "../types/api-types";
 import {
@@ -180,4 +181,6 @@ export const api = {
     return res.text();
   },
   
+  updateShortAnswer: (dto: UpdateShortAnswerDto) =>
+    request<void>(`/api/tasks/update-short-answer`, "PUT", dto),
 };
