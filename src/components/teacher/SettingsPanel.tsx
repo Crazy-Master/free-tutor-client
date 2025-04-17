@@ -32,7 +32,6 @@ const SettingsPanel = () => {
           onChange={(e) => setTheme(e.target.value as ThemeName)}
           className="border px-3 py-2 rounded w-full"
         >
-          <option value="light">Светлая</option>
           <option value="violet">Фиолетовая</option>
           <option value="olive">Оливковая</option>
           <option value="orange">Оранжевая</option>

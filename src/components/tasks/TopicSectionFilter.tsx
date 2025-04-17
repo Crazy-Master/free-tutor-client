@@ -15,10 +15,8 @@ const TopicSectionFilter: React.FC<Props> = ({
   onChange,
   loadedTopics
 }) => {
-  // Уникальные секции
   const sections = Array.from(new Set(topics.map((t) => t.section)));
 
-  // Сопоставление section -> topicIds
   const sectionToTopics = sections.reduce<Record<string, number[]>>(
     (acc, section) => {
       acc[section] = topics
@@ -29,7 +27,6 @@ const TopicSectionFilter: React.FC<Props> = ({
     {}
   );
 
-  // Обработка флажка секции
   const toggleSection = (section: string) => {
     const topicIdsInSection = sectionToTopics[section];
     const isFullySelected = topicIdsInSection.every((id) =>
@@ -40,7 +37,7 @@ const TopicSectionFilter: React.FC<Props> = ({
       ? selectedTopicIds.filter((id) => !topicIdsInSection.includes(id))
       : Array.from(new Set([...selectedTopicIds, ...topicIdsInSection]));
 
-    onChange(updated.filter((id) => id !== -1)); // удалить -1 если попал
+    onChange(updated.filter((id) => id !== -1));
   };
 
   const isSectionSelected = (section: string) => {
@@ -51,7 +48,6 @@ const TopicSectionFilter: React.FC<Props> = ({
   const isEmpty = loadedTopics && topics.length === 0;
   return (
     <div className="flex flex-col gap-2">
-      {/* Флажки секций */}
       {!isEmpty && (
         <div className="flex flex-col gap-2">
           {sections.map((section) => (
@@ -71,7 +67,6 @@ const TopicSectionFilter: React.FC<Props> = ({
         </div>
       )}
 
-      {/* Dropdown тем */}
       <MultiSelectDropdown
         label="Темы"
         options={
