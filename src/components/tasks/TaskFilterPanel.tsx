@@ -5,6 +5,7 @@ import SingleSelectDropdown from "../common/SingleSelectDropdown";
 import { useDictionaryStore } from "../../store/dictionaryStore";
 import { TaskFilterDto } from "../../types/api-types";
 import { useLoadDictionaries } from "../../hooks/useLoadDictionaries";
+import TopicSectionFilter from "./TopicSectionFilter";
 
 interface Props {
   onSearch: (dto: TaskFilterDto) => void;
@@ -77,7 +78,13 @@ const TaskFilterPanel: React.FC<Props> = ({ onSearch, onReset }) => {
             label="Теги"
             options={
               loadedTaskTags && taskTags.length === 0
-                ? [{ id: -1, label: "отсутствует список тегов", disabled: true }]
+                ? [
+                    {
+                      id: -1,
+                      label: "отсутствует список тегов",
+                      disabled: true,
+                    },
+                  ]
                 : taskTags.map((t) => ({
                     id: t.tagId,
                     label: t.name,
@@ -88,22 +95,24 @@ const TaskFilterPanel: React.FC<Props> = ({ onSearch, onReset }) => {
             onChange={(ids) => setTagIds(ids.filter((id) => id !== -1))}
           />
 
-          <MultiSelectDropdown
-            label="Темы"
-            options={
-              loadedTopics && topics.length === 0
-                ? [{ id: -1, label: "отсутствует список тем", disabled: true }]
-                : topics.map((t) => ({ id: t.topicId, label: t.topic }))
-            }
-            selected={topicIds}
-            onChange={(ids) => setTopicIds(ids.filter((id) => id !== -1))}
+          <TopicSectionFilter
+            topics={topics}
+            selectedTopicIds={topicIds}
+            onChange={(ids) => setTopicIds(ids)}
+            loadedTopics={loadedTopics}
           />
 
           <MultiSelectDropdown
             label="Номера в тесте"
             options={
               loadedTestNumbers && testNumbers.length === 0
-                ? [{ id: -1, label: "отсутствует список номеров", disabled: true }]
+                ? [
+                    {
+                      id: -1,
+                      label: "отсутствует список номеров",
+                      disabled: true,
+                    },
+                  ]
                 : testNumbers.map((n) => ({
                     id: n.testNumberId,
                     label: `${n.number}${n.name ? ` – ${n.name}` : ""}`,
@@ -117,7 +126,13 @@ const TaskFilterPanel: React.FC<Props> = ({ onSearch, onReset }) => {
             label="Тип ответа"
             options={
               loadedTypeResponses && typeResponses.length === 0
-                ? [{ id: -1, label: "отсутствует список вариантов ответов", disabled: true }]
+                ? [
+                    {
+                      id: -1,
+                      label: "отсутствует список вариантов ответов",
+                      disabled: true,
+                    },
+                  ]
                 : typeResponses.map((t) => ({
                     id: t.typeResponseId,
                     label: t.nameResponse,
@@ -129,7 +144,9 @@ const TaskFilterPanel: React.FC<Props> = ({ onSearch, onReset }) => {
 
           <div className="flex flex-wrap gap-4">
             <div className="flex flex-col max-w-[300px] w-full">
-              <label className="mb-1 text-sm text-gray-700">Номер на сайте</label>
+              <label className="mb-1 text-sm text-gray-700">
+                Номер на сайте
+              </label>
               <input
                 type="number"
                 placeholder="Введите ID"
@@ -140,7 +157,9 @@ const TaskFilterPanel: React.FC<Props> = ({ onSearch, onReset }) => {
             </div>
 
             <div className="flex flex-col max-w-[300px] w-full">
-              <label className="mb-1 text-sm text-gray-700">Номер на ФИПИ</label>
+              <label className="mb-1 text-sm text-gray-700">
+                Номер на ФИПИ
+              </label>
               <input
                 type="text"
                 placeholder="Например: 10A"

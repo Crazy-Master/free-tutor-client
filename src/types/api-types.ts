@@ -92,6 +92,7 @@ export interface TaskTagDto {
 
 export interface TopicDto {
   topicId: number;
+  section: string;
   topic: string;
 }
 
