@@ -38,7 +38,9 @@ const RegistrationPage = () => {
   useEffect(() => {
     const fetchDisciplines = async () => {
       try {
-        const response = await fetch("https://api-tutor-master.ru/api/disciplines");
+        const response = await fetch(
+          "https://api-tutor-master.ru/api/disciplines"
+        );
         if (!response.ok) throw new Error("Ошибка загрузки дисциплин");
         const data = await response.json();
         setDisciplines(data);
@@ -55,7 +57,9 @@ const RegistrationPage = () => {
     setError("");
 
     if (!isPasswordValid) {
-      setError("Пароль должен содержать минимум 6 символов, одну заглавную букву и одну цифру.");
+      setError(
+        "Пароль должен содержать минимум 6 символов, одну заглавную букву и одну цифру."
+      );
       return;
     }
 
@@ -73,24 +77,29 @@ const RegistrationPage = () => {
         notes: {},
       };
 
-      const response = await fetch("https://api-tutor-master.ru/api/users/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          login,
-          email,
-          password,
-          role: role === "student" ? 0 : 1,
-          information,
-        }),
-      });
+      const response = await fetch(
+        "https://api-tutor-master.ru/api/users/register",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            login,
+            email,
+            password,
+            role: role === "student" ? 0 : 1,
+            information,
+          }),
+        }
+      );
 
       if (!response.ok) {
         let errorMsg = "Ошибка регистрации.";
         try {
           const data = await response.json();
           if (data?.message) errorMsg = data.message;
-        } catch {}
+        } catch {
+          // Игнорируем ошибку парсинга (ответ пустой)
+          }
         setError(errorMsg);
         return;
       }
