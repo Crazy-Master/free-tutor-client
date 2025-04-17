@@ -70,10 +70,10 @@ const EditFieldModal: React.FC<EditFieldModalProps> = ({
       >
         <h2 className="text-lg font-semibold mb-4">{title}</h2>
 
-        <label className="block text-sm font-medium mb-1">{label}</label>
+        <label className="block font-medium mb-1">{label}</label>
         <input
           type={inputType}
-          className="w-full p-2 border rounded mb-4 text-black dark:text-white"
+          className="w-full p-2 border rounded mb-4 text-black dark:text-text_light"
           value={value}
           onChange={(e) => setValue(e.target.value)}
         />
@@ -88,7 +88,7 @@ const EditFieldModal: React.FC<EditFieldModalProps> = ({
           </button>
           <button
             onClick={handleSubmit}
-            className="px-4 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="px-4 py-1 bg-primary text-text_light rounded hover:bg-blue-700"
             disabled={loading}
           >
             Сохранить

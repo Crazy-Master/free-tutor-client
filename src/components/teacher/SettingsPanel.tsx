@@ -62,7 +62,7 @@ const SettingsPanel = () => {
 
       <button
         onClick={handleLogout}
-        className="w-full mt-4 bg-red-500 text-white py-2 rounded hover:bg-red-600"
+        className="w-full mt-4 bg-red-500 text-text_light py-2 rounded hover:bg-red-600"
       >
         🚪 Выйти из аккаунта
       </button>

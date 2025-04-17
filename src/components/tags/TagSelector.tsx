@@ -65,7 +65,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({
   return (
     <div className="relative" ref={ref}>
       <div
-        className="overflow-x-auto flex gap-2 max-w-[320px] whitespace-nowrap px-2 py-1 border rounded bg-gray-50 text-xs cursor-pointer"
+        className="overflow-x-auto flex gap-2 max-w-[320px] whitespace-nowrap px-2 py-1 rounded bg-secondary_other text-sm cursor-pointer"
         onClick={toggleDropdown}
       >
         {selectedTags.length > 0 ? (
@@ -84,7 +84,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({
       </div>
 
       {isOpen && (
-        <div className="absolute z-40 mt-1 left-1/2 transform -translate-x-1/2 bg-white dark:bg-gray-800 border rounded shadow p-3 w-64 text-sm space-y-2">
+        <div className="absolute z-40 mt-1 left-1/2 transform -translate-x-1/2 bg-white dark:bg-gray-800 border rounded shadow p-3 w-80 text-md space-y-2">
           {taskTags.map((tag) => {
             const isTagSelected = isSelected(tag.tagId);
 
@@ -107,7 +107,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({
                   <span className="text-xs text-gray-500 ml-1">⚙️</span>
                 )}
                 <span
-                  className="px-2 py-0.5 rounded truncate max-w-full overflow-hidden whitespace-nowrap"
+                  className="px-2 py-0.5  rounded truncate max-w-full overflow-hidden whitespace-nowrap"
                   style={{ backgroundColor: tag.color, color: "#fff" }}
                 >
                   {tag.name}
@@ -119,13 +119,13 @@ const TagSelector: React.FC<TagSelectorProps> = ({
           <div className="flex justify-between pt-2 border-t mt-2">
             <button
               onClick={() => setShowCreateModal(true)}
-              className="text-blue-600 text-xs underline"
+              className="px-2 py-1 bg-primary text-text_light rounded hover:opacity-90"
             >
               ➕ Создать тег
             </button>
             <button
               onClick={() => setEditMode((prev) => !prev)}
-              className="text-blue-600 text-xs underline"
+              className="px-2 py-1 bg-primary text-text_light rounded hover:opacity-90"
             >
               🛠 Редактировать
             </button>

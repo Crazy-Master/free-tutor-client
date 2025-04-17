@@ -71,7 +71,7 @@ const TeacherPage = () => {
               footer={
                 <button
                   onClick={() => setShowAddModal(true)}
-                  className="px-4 py-2 bg-primary text-white rounded w-full hover:opacity-90"
+                  className="px-4 py-2 bg-primary text-text_light rounded w-full hover:opacity-90"
                 >
                   ➕ Добавить ученика
                 </button>

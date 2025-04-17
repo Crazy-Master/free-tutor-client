@@ -1,31 +1,30 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-:root.theme-light {
-    --color-primary: #C4C3E3;
-    --color-secondary: #504E76;
-    --color-background: #ffffff;
-    --color-text: #000000;
-  }
   
   :root.theme-violet {
     --color-primary: #504E76;
     --color-secondary: #C4C3E3;
+    --color-secondary_other: #E0E0E0;
     --color-background: #ffffff;
-    --color-text: #000000;
+    --color-text_light: #ffffff;
+    --color-text_dark: #000000;
   }
   
   :root.theme-olive {
     --color-primary: #A3B565;
     --color-secondary: #FDF8E2;
+    --color-secondary_other: #E0E0E0;
     --color-background: #ffffff;
-    --color-text: #000000;
+    --color-text_light: #ffffff;
+    --color-text_dark: #000000;
   }
   
   :root.theme-orange {
     --color-primary: #F1642E;
     --color-secondary: #FCDD9D;
+    --color-secondary_other: #E0E0E0;
     --color-background: #ffffff;
-    --color-text: #000000;
+    --color-text_light: #ffffff;
+    --color-text_dark: #000000;
   }

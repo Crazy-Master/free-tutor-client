@@ -101,7 +101,7 @@ const TaskCardFooter: React.FC<Props> = ({
         )}
       </div>
 
-      <div className="text-gray-500 text-xs">
+      <div className="text-gray-500">
         {year} – {relevance}
       </div>
 

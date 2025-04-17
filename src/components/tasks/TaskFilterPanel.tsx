@@ -66,7 +66,7 @@ const TaskFilterPanel: React.FC<Props> = ({ onSearch, onReset }) => {
     <div className="w-full bg-gray-100 p-4 mb-4 rounded-lg shadow-md">
       <button
         onClick={() => setExpanded((prev) => !prev)}
-        className="mb-4 px-4 py-2 bg-primary text-white rounded hover:opacity-90"
+        className="mb-4 px-4 py-2 bg-primary text-text_light rounded hover:opacity-90"
       >
         {expanded ? "Скрыть фильтр" : "Показать фильтр"}
       </button>
@@ -157,7 +157,7 @@ const TaskFilterPanel: React.FC<Props> = ({ onSearch, onReset }) => {
                 handleSearch();
                 setExpanded(false);
               }}
-              className="px-4 py-2 bg-primary text-white rounded hover:opacity-90"
+              className="px-4 py-2 bg-primary text-text_light rounded hover:opacity-90"
             >
               Найти
             </button>

@@ -52,7 +52,7 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="z-50 bg-primary text-white px-6 py-3 shadow flex justify-between items-center">
+    <header className="z-50 bg-primary text-text_light px-6 py-3 shadow flex justify-between items-center">
       <div className="flex items-center gap-4">
         {showBackButton && (
           <button

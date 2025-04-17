@@ -45,7 +45,7 @@ const CreateTagModal: React.FC<CreateTagModalProps> = ({
         <h3 className="text-lg font-semibold">Создать тег</h3>
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
-            <label className="block text-sm">Название</label>
+            <label className="block text-md">Название</label>
             <input
               type="text"
               value={name}
@@ -55,7 +55,7 @@ const CreateTagModal: React.FC<CreateTagModalProps> = ({
             />
           </div>
           <div>
-            <label className="block text-sm">Цвет</label>
+            <label className="block text-md">Цвет</label>
             <input
               type="color"
               value={color}
@@ -68,13 +68,13 @@ const CreateTagModal: React.FC<CreateTagModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              className="px-4 py-2 bg-secondary_other text-text_dark rounded hover:opacity-90"
             >
               Отмена
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              className="px-4 py-2 bg-primary text-text_light rounded hover:opacity-90"
               disabled={!name || !color}
             >
               Создать

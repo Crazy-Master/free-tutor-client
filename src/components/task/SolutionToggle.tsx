@@ -36,7 +36,7 @@ const SolutionToggle: React.FC<SolutionToggleProps> = ({ answer, taskId }) => {
           </div>
 
           <button
-            className="text-blue-600 underline hover:text-blue-800"
+            className="px-4 py-1 bg-primary text-text_light rounded hover:opacity-90"
             onClick={() => setShowEditModal(true)}
           >
             Изменить ответ
@@ -47,7 +47,7 @@ const SolutionToggle: React.FC<SolutionToggleProps> = ({ answer, taskId }) => {
           <div className="flex-1 text-center">
             <button
               onClick={() => setExpanded(!expanded)}
-              className="text-blue-600 underline hover:text-blue-800"
+              className="px-4 py-1 bg-primary text-text_light rounded hover:opacity-90"
             >
               {expanded ? "Скрыть развёрнутый ответ" : "Развёрнутый ответ"}
             </button>

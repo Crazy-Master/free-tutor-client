@@ -60,7 +60,7 @@ const MultiSelectDropdown: React.FC<Props> = ({
           onClick={() => setIsOpen((prev) => !prev)}
           className="w-full text-left px-3 py-2 border rounded bg-white text-black flex justify-between items-center"
         >
-          Выбор
+          {selected.length === 0 ? "Выбор" : `Выбрано: ${selected.length}`}
           <FiChevronDown
             className={`ml-2 transform ${isOpen ? "rotate-180" : ""}`}
           />
@@ -77,7 +77,7 @@ const MultiSelectDropdown: React.FC<Props> = ({
                 selected.includes(option.id) ? "bg-primary/10" : ""
               }`}
             >
-              <div className="min-w-[20px] w-5 h-5 border rounded flex items-center justify-center bg-white">
+              <div className="min-w-[20px] w-5 h-5 border rounded flex items-center justify-center bg-white mt-[2px]">
                 {selected.includes(option.id) && (
                   <FiCheck className="text-primary text-md" />
                 )}

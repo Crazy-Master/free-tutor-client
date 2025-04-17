@@ -19,28 +19,28 @@ const ActionPanel: React.FC<ActionPanelProps> = ({
 
       <button
         onClick={onShowStudents}
-        className="w-full bg-primary text-white px-4 py-2 rounded hover:opacity-90"
+        className="w-full bg-primary text-text_light px-4 py-2 rounded hover:opacity-90"
       >
         📋 Список учеников
       </button>
 
       <button
         onClick={onShowProfile}
-        className="w-full bg-primary text-white px-4 py-2 rounded hover:opacity-90"
+        className="w-full bg-primary text-text_light px-4 py-2 rounded hover:opacity-90"
       >
         👤 Информация обо мне
       </button>
 
       <button
         onClick={onShowSettings}
-        className="w-full bg-primary text-white px-4 py-2 rounded hover:opacity-90"
+        className="w-full bg-primary text-text_light px-4 py-2 rounded hover:opacity-90"
       >
         ⚙ Настройки
       </button>
 
       <button
         onClick={onOpenTaskBase}
-        className="w-full bg-primary text-white px-4 py-2 rounded hover:opacity-90"
+        className="w-full bg-primary text-text_light px-4 py-2 rounded hover:opacity-90"
       >
         📚 База задач
       </button>
