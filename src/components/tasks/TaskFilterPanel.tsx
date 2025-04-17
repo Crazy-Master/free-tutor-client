@@ -63,7 +63,7 @@ const TaskFilterPanel: React.FC<Props> = ({ onSearch, onReset }) => {
   };
 
   return (
-    <div className="w-full bg-gray-100 p-4 mb-4 rounded-lg shadow-md">
+    <div className="w-full bg-secondary p-4 mb-4 rounded-lg shadow-md">
       <button
         onClick={() => setExpanded((prev) => !prev)}
         className="mb-4 px-4 py-2 bg-primary text-text_light rounded hover:opacity-90"
@@ -163,7 +163,7 @@ const TaskFilterPanel: React.FC<Props> = ({ onSearch, onReset }) => {
             </button>
             <button
               onClick={handleReset}
-              className="px-4 py-2 bg-gray-300 text-black rounded hover:opacity-90"
+              className="px-4 py-2 bg-secondary text-black rounded hover:opacity-90"
             >
               Сбросить фильтр
             </button>

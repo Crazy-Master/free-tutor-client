@@ -65,7 +65,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({
   return (
     <div className="relative" ref={ref}>
       <div
-        className="overflow-x-auto flex gap-2 max-w-[320px] whitespace-nowrap px-2 py-1 rounded bg-secondary_other text-sm cursor-pointer"
+        className="overflow-x-auto flex gap-2 max-w-[320px] whitespace-nowrap px-2 py-1 rounded bg-secondary text-sm cursor-pointer"
         onClick={toggleDropdown}
       >
         {selectedTags.length > 0 ? (

@@ -22,7 +22,7 @@ interface PopupConfirmProps {
             </button>
             <button
               onClick={onCancel}
-              className="bg-gray-300 dark:bg-gray-700 px-4 py-2 rounded hover:bg-gray-400 dark:hover:bg-gray-600"
+              className="bg-secondary dark:bg-gray-700 px-4 py-2 rounded hover:bg-secondary dark:hover:bg-gray-600"
             >
               Нет
             </button>

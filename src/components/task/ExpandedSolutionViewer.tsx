@@ -80,20 +80,20 @@ const ExpandedSolutionViewer: React.FC<Props> = ({ answer }) => {
   if (available.length === 0) return null;
 
   return (
-    <div className="max-w-[800px] mx-auto mt-4 border rounded p-4 shadow-sm text-sm bg-gray-50 dark:bg-gray-700">
+    <div className="max-w-[800px] mx-auto mt-4 border rounded p-4 shadow-sm text-md bg-gray-50 dark:bg-gray-700">
       <div className="font-semibold mb-2 text-center">{renderHeader()}</div>
       <div className="text-center mb-4">{renderContent()}</div>
 
       <div className="flex justify-between">
         <button
           onClick={prev}
-          className="px-4 py-1 bg-gray-200 dark:bg-gray-600 rounded hover:bg-gray-300 dark:hover:bg-gray-500"
+          className="px-4 py-1 bg-secondary rounded hover:opacity-80"
         >
           Назад
         </button>
         <button
           onClick={next}
-          className="px-4 py-1 bg-gray-200 dark:bg-gray-600 rounded hover:bg-gray-300 dark:hover:bg-gray-500"
+          className="px-4 py-1 bg-secondary rounded hover:opacity-80"
         >
           Вперед
         </button>

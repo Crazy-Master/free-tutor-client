@@ -27,7 +27,7 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
 
   return (
     <div className="flex justify-between items-start mb-2 gap-2 flex-wrap">
-      <div className="text-md font-bold bg-secondary_other px-2 py-0.5 rounded whitespace-nowrap">ID: {taskId}</div>
+      <div className="text-md font-bold bg-secondary px-2 py-0.5 rounded whitespace-nowrap">ID: {taskId}</div>
 
       <TagSelector
         taskId={taskId}
@@ -38,7 +38,7 @@ const TaskCardHeader: React.FC<TaskCardHeaderProps> = ({
       />
 
       {testNumber && (
-        <div className="text-md bg-secondary_other px-2 py-0.5 rounded whitespace-nowrap">
+        <div className="text-md bg-secondary px-2 py-0.5 rounded whitespace-nowrap">
           №{testNumber}
         </div>
       )}

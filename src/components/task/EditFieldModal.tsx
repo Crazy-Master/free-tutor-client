@@ -81,14 +81,14 @@ const EditFieldModal: React.FC<EditFieldModalProps> = ({
         <div className="flex justify-end gap-2">
           <button
             onClick={onClose}
-            className="px-4 py-1 bg-gray-300 dark:bg-gray-600 rounded hover:bg-gray-400"
+            className="px-4 py-2 bg-secondary dark:bg-gray-600 rounded hover:opacity-80"
             disabled={loading}
           >
             Отмена
           </button>
           <button
             onClick={handleSubmit}
-            className="px-4 py-1 bg-primary text-text_light rounded hover:bg-blue-700"
+            className="px-4 py-2 bg-primary text-text_light rounded hover:bg-blue-700"
             disabled={loading}
           >
             Сохранить

@@ -70,7 +70,7 @@ const SingleSelectDropdown: React.FC<Props> = ({
           {/* Дополнительный пункт для сброса */}
           <div
             onClick={() => handleSelect(-1)}
-            className={`flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-100 ${
+            className={`flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-secondary ${
               selected === null ? "bg-primary/10" : ""
             }`}
           >
@@ -83,7 +83,7 @@ const SingleSelectDropdown: React.FC<Props> = ({
             <div
               key={option.id}
               onClick={() => handleSelect(option.id)}
-              className={`flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-100 ${
+              className={`flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-secondary ${
                 selected === option.id ? "bg-primary/10" : ""
               }`}
             >

@@ -64,7 +64,7 @@ const EditTagModal: React.FC<EditTagModalProps> = ({
         <h3 className="text-lg font-semibold">Редактировать тег</h3>
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
-            <label className="block text-sm">Название</label>
+            <label className="block text-md">Название</label>
             <input
               type="text"
               value={name}
@@ -74,7 +74,7 @@ const EditTagModal: React.FC<EditTagModalProps> = ({
             />
           </div>
           <div>
-            <label className="block text-sm">Цвет</label>
+            <label className="block text-md">Цвет</label>
             <input
               type="color"
               value={color}
@@ -95,13 +95,13 @@ const EditTagModal: React.FC<EditTagModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                className="px-4 py-2 bg-secondary text-text_dark rounded hover:opacity-80"
               >
                 Отмена
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-blue-600 text-text_light rounded hover:bg-blue-700"
+                className="px-4 py-2 bg-primary text-text_light rounded hover:opacity-90"
                 disabled={!name || !color}
               >
                 Сохранить

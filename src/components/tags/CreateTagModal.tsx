@@ -68,13 +68,13 @@ const CreateTagModal: React.FC<CreateTagModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-secondary_other text-text_dark rounded hover:opacity-90"
+              className="px-4 py-2 bg-secondary text-text_dark rounded hover:opacity-80"
             >
               Отмена
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-primary text-text_light rounded hover:opacity-90"
+              className="px-4 py-2 bg-primary text-text_light rounded hover:opacity-80"
               disabled={!name || !color}
             >
               Создать

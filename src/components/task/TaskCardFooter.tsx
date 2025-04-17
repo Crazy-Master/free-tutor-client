@@ -58,7 +58,7 @@ const TaskCardFooter: React.FC<Props> = ({
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
       >
-        <div className="underline text-blue-600 hover:text-blue-800 cursor-pointer">
+        <div className="px-2 py-1 bg-primary text-text_light rounded hover:opacity-90 cursor-pointer">
           Инфо
         </div>
 

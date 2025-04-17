@@ -57,7 +57,7 @@ const Header: React.FC = () => {
         {showBackButton && (
           <button
             onClick={() => navigate(-1)}
-            className="bg-white text-primary px-3 py-1 rounded hover:bg-gray-100"
+            className="bg-white text-primary px-3 py-1 rounded hover:bg-secondary"
           >
             ← Назад
           </button>

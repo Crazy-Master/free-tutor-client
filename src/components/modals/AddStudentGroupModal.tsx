@@ -86,7 +86,7 @@ const AddStudentGroupModal = ({ disciplineId, onClose, onSuccess }: Props) => {
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-secondary_other rounded hover:bg-gray-300"
+              className="px-4 py-2 bg-secondary rounded hover:bg-secondary"
             >
               Отмена
             </button>
