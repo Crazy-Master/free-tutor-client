@@ -66,14 +66,14 @@ const EditFieldModal: React.FC<EditFieldModalProps> = ({
     <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
       <div
         ref={modalRef}
-        className="bg-white dark:bg-gray-800 p-6 rounded shadow-md w-[90%] max-w-md"
+        className="bg-white  p-6 rounded shadow-md w-[90%] max-w-md"
       >
         <h2 className="text-lg font-semibold mb-4">{title}</h2>
 
         <label className="block font-medium mb-1">{label}</label>
         <input
           type={inputType}
-          className="w-full p-2 border rounded mb-4 text-black dark:text-text_light"
+          className="w-full p-2 border rounded mb-4 text-black"
           value={value}
           onChange={(e) => setValue(e.target.value)}
         />
@@ -81,7 +81,7 @@ const EditFieldModal: React.FC<EditFieldModalProps> = ({
         <div className="flex justify-end gap-2">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-secondary dark:bg-gray-600 rounded hover:opacity-80"
+            className="px-4 py-2 bg-secondary  rounded hover:opacity-80"
             disabled={loading}
           >
             Отмена

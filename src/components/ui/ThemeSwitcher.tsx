@@ -2,7 +2,7 @@ import { useTheme } from "../../lib/theme";
 
 const ThemeSwitcher = () => {
   const { theme, setTheme } = useTheme();
-  const themes = ["light", "violet", "olive", "orange"] as const;
+  const themes = ["violet", "olive", "orange"] as const;
 
   return (
     <select

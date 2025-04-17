@@ -66,7 +66,7 @@ const SolutionViewer: React.FC<Props> = ({ answer }) => {
         <span className="font-medium">{typeLabel[current]}</span>
         <button onClick={goNext} className="text-lg px-2 hover:text-black">→</button>
       </div>
-      <div className="p-2 bg-white dark:bg-gray-900 rounded border">
+      <div className="p-2 bg-white  rounded border">
         {renderContent()}
       </div>
     </div>

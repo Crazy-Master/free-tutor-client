@@ -80,7 +80,7 @@ const ExpandedSolutionViewer: React.FC<Props> = ({ answer }) => {
   if (available.length === 0) return null;
 
   return (
-    <div className="max-w-[800px] mx-auto mt-4 border rounded p-4 shadow-sm text-md bg-gray-50 dark:bg-gray-700">
+    <div className="max-w-[800px] mx-auto mt-4 border rounded p-4 shadow-sm text-md bg-gray-50 ">
       <div className="font-semibold mb-2 text-center">{renderHeader()}</div>
       <div className="text-center mb-4">{renderContent()}</div>
 

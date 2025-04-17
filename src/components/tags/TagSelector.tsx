@@ -84,7 +84,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({
       </div>
 
       {isOpen && (
-        <div className="absolute z-40 mt-1 left-1/2 transform -translate-x-1/2 bg-white dark:bg-gray-800 border rounded shadow p-3 w-80 text-md space-y-2">
+        <div className="absolute z-40 mt-1 left-1/2 transform -translate-x-1/2 bg-white  border rounded shadow p-3 w-80 text-md space-y-2">
           {taskTags.map((tag) => {
             const isTagSelected = isSelected(tag.tagId);
 

@@ -64,7 +64,7 @@ const TaskCardFooter: React.FC<Props> = ({
 
         {isHovering && (
           <div
-            className="overflow-x-auto absolute left-0 bottom-0 z-10 bg-white dark:bg-gray-800 border shadow-md p-3 rounded w-max text-sm text-left"
+            className="overflow-x-auto absolute left-0 bottom-0 z-10 bg-white  border shadow-md p-3 rounded w-max text-sm text-left"
             style={{ width: `${Math.min(windowWidth * 0.7, 925)}px` }}
           >
             <div>

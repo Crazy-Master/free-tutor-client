@@ -41,7 +41,7 @@ const TaskCardBase: React.FC<TaskCardBaseProps> = ({
 
   return (
     <div className="max-w-[1000px] mx-auto p-4">
-      <div className="border rounded shadow-md p-4 bg-white dark:bg-gray-900 space-y-4">
+      <div className="border rounded shadow-md p-4 bg-white space-y-4">
         <TaskCardHeader
           taskId={taskId}
           tagIds={tagIds}

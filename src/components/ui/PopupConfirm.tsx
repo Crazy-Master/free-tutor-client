@@ -11,7 +11,7 @@ interface PopupConfirmProps {
   }: PopupConfirmProps) => {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm pointer-events-auto">
-        <div className="bg-white dark:bg-gray-800 text-black dark:text-text_light p-6 rounded shadow-xl w-full max-w-md text-center space-y-4">
+        <div className="bg-white  text-black p-6 rounded shadow-xl w-full max-w-md text-center space-y-4">
           <p className="text-lg font-medium">{message}</p>
           <div className="flex justify-center gap-4">
             <button
@@ -22,7 +22,7 @@ interface PopupConfirmProps {
             </button>
             <button
               onClick={onCancel}
-              className="bg-secondary dark:bg-gray-700 px-4 py-2 rounded hover:bg-secondary dark:hover:bg-gray-600"
+              className="bg-secondary  px-4 py-2 rounded hover:bg-secondary"
             >
               Нет
             </button>
