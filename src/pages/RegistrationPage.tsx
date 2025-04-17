@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../store/auth";
 import { useUser } from "../store/user";
+import { useDisciplineStore } from "../store/disciplineStore";
+import { dictionaryService } from "../services/dictionaryService";
+
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import ErrorBox from "../components/ui/ErrorBox";
@@ -16,6 +19,7 @@ const RegistrationPage = () => {
   const navigate = useNavigate();
   const { login: saveToken } = useAuth();
   const { setUser } = useUser();
+  const { setDisciplineId } = useDisciplineStore();
 
   const [login, setLogin] = useState("");
   const [email, setEmail] = useState("");
@@ -23,7 +27,7 @@ const RegistrationPage = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState("");
-  const [disciplineId, setDisciplineId] = useState<number | null>(null);
+  const [disciplineId, setDisciplineIdLocal] = useState<number | null>(null);
   const [disciplines, setDisciplines] = useState<DisciplineDto[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -34,9 +38,7 @@ const RegistrationPage = () => {
   useEffect(() => {
     const fetchDisciplines = async () => {
       try {
-        const response = await fetch(
-          "https://api-tutor-master.ru/api/disciplines"
-        );
+        const response = await fetch("https://api-tutor-master.ru/api/disciplines");
         if (!response.ok) throw new Error("Ошибка загрузки дисциплин");
         const data = await response.json();
         setDisciplines(data);
@@ -53,9 +55,7 @@ const RegistrationPage = () => {
     setError("");
 
     if (!isPasswordValid) {
-      setError(
-        "Пароль должен содержать минимум 6 символов, одну заглавную букву и одну цифру."
-      );
+      setError("Пароль должен содержать минимум 6 символов, одну заглавную букву и одну цифру.");
       return;
     }
 
@@ -73,29 +73,24 @@ const RegistrationPage = () => {
         notes: {},
       };
 
-      const response = await fetch(
-        "https://api-tutor-master.ru/api/users/register",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            login,
-            email,
-            password,
-            role: role === "student" ? 0 : 1, // 0 = student, 1 = teacher
-            information,
-          }),
-        }
-      );
+      const response = await fetch("https://api-tutor-master.ru/api/users/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          login,
+          email,
+          password,
+          role: role === "student" ? 0 : 1,
+          information,
+        }),
+      });
 
       if (!response.ok) {
         let errorMsg = "Ошибка регистрации.";
         try {
           const data = await response.json();
           if (data?.message) errorMsg = data.message;
-        } catch {
-          // Игнорируем ошибку парсинга (ответ пустой)
-        }
+        } catch {}
         setError(errorMsg);
         return;
       }
@@ -103,6 +98,12 @@ const RegistrationPage = () => {
       const data = await response.json();
       saveToken(data.tokenString);
       setUser(data.userAuthDto);
+
+      const lastId = data.userAuthDto.information?.lastDisciplineId;
+      if (lastId) {
+        setDisciplineId(lastId);
+        dictionaryService.reset();
+      }
 
       const payload = JSON.parse(atob(data.tokenString.split(".")[1]));
       const userRole = payload.role;
@@ -114,7 +115,7 @@ const RegistrationPage = () => {
       } else if (userRole === "admin") {
         navigate("/admin");
       } else {
-        navigate("/"); // fallback
+        navigate("/");
       }
     } catch (err) {
       setError("Ошибка подключения к серверу." + err);
@@ -215,7 +216,7 @@ const RegistrationPage = () => {
               value={role}
               onChange={(e) => {
                 setRole(e.target.value);
-                setDisciplineId(null);
+                setDisciplineIdLocal(null);
               }}
               required
             >
@@ -233,7 +234,7 @@ const RegistrationPage = () => {
               <select
                 className="w-full border rounded px-3 py-2"
                 value={disciplineId ?? ""}
-                onChange={(e) => setDisciplineId(Number(e.target.value))}
+                onChange={(e) => setDisciplineIdLocal(Number(e.target.value))}
                 required
               >
                 <option value="" disabled>
