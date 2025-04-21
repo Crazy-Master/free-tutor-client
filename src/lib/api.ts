@@ -1,5 +1,4 @@
 import { getToken } from "../store/auth";
-import { UserInfoDto } from "../store/user";
 import {
   DisciplineDto,
   StudentCardInfoDto,
@@ -7,6 +6,7 @@ import {
   StudentToTeacherDto,
   UpdateGroupNumberDto,
   UpdateShortAnswerDto,
+  UserInfoDto,
   UserInfoExtendedDto,
 } from "../types/api-types";
 import { PagedResultDto, TaskDto, TaskFilterDto } from "../types/api-types";
@@ -71,33 +71,32 @@ export const api = {
 
   getTasks: async (filter: TaskFilterDto): Promise<PagedResultDto<TaskDto>> => {
     const query = new URLSearchParams();
-  
+
     if (filter.tagIds?.length)
       filter.tagIds.forEach((id) => query.append("tagIds", id.toString()));
-  
+
     if (filter.topicIds?.length)
       filter.topicIds.forEach((id) => query.append("topicIds", id.toString()));
-  
+
     if (filter.testNumberIds?.length)
       filter.testNumberIds.forEach((id) =>
         query.append("testNumberIds", id.toString())
       );
-  
+
     if (filter.typeResponseId !== undefined)
       query.append("typeResponseId", filter.typeResponseId.toString());
-  
+
     if (filter.taskId !== undefined)
       query.append("taskId", filter.taskId.toString());
-  
+
     if (filter.taskIdExternal)
       query.append("taskIdExternal", filter.taskIdExternal);
-  
+
     if (filter.pageNumber)
       query.append("pageNumber", filter.pageNumber.toString());
-  
-    if (filter.pageSize)
-      query.append("pageSize", filter.pageSize.toString());
-  
+
+    if (filter.pageSize) query.append("pageSize", filter.pageSize.toString());
+
     const res = await fetch(
       `https://api-tutor-master.ru/api/tasks?${query.toString()}`,
       {
@@ -108,11 +107,11 @@ export const api = {
         },
       }
     );
-  
+
     if (!res.ok) {
       throw new Error("Ошибка загрузки задач");
     }
-  
+
     const data: PagedResultDto<TaskDto> = await res.json();
     return data;
   },
@@ -171,36 +170,47 @@ export const api = {
 
   getTopicNamesByTaskId: (taskId: number) =>
     request<string[]>(`/api/topics/by-task/${taskId}`),
-  
+
   getTypeResponseNameByTaskId: async (taskId: number) => {
-    const res = await fetch(`${BASE_URL}/api/type-responses/by-task/${taskId}`, {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    });
-  
-    if (!res.ok) throw new Error(await res.text() || "Ошибка API");
-  
+    const res = await fetch(
+      `${BASE_URL}/api/type-responses/by-task/${taskId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      }
+    );
+
+    if (!res.ok) throw new Error((await res.text()) || "Ошибка API");
+
     return res.text();
   },
-  
+
   updateShortAnswer: (dto: UpdateShortAnswerDto) =>
     request<void>(`/api/tasks/update-short-answer`, "PUT", dto),
-  
+
   updateGroupNumber: (dto: UpdateGroupNumberDto) =>
     request<void>(`/api/tasks/update-group-number`, "PUT", dto),
 
   getUserInfo: (userId: number) =>
     request<UserInfoExtendedDto>(`/api/users/information/${userId}`),
-  
+
   getStudentInfo: (studentId: number) =>
-    request<StudentInfoDto>(`/api/student-to-teacher/teacher-info/${studentId}`),
-  
+    request<StudentInfoDto>(
+      `/api/student-to-teacher/teacher-info/${studentId}`
+    ),
+
   updateStudentCompletedTopics: (studentId: number, topicIds: number[]) =>
     request<void>("/api/student-to-teacher/teacher-info-only", "PUT", {
       id: studentId,
       information: {
         completedTopicIds: topicIds,
       },
+    }),
+
+  logout: () =>
+    fetch("https://api-tutor-master.ru/api/auth/logout", {
+      method: "POST",
+      credentials: "include",
     }),
 };

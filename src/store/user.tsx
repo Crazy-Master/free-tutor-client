@@ -1,51 +1,31 @@
-import { createContext, useContext, useState, useEffect } from "react";
-
-export interface UserInfoDto {
-  lastDisciplineId: number;
-  studentIds: number[];
-  notes: Record<number, string>;
-}
-
-export interface UserAuthDto {
-  email: string;
-  lastActiveAt: string | null;
-  information: UserInfoDto;
-}
+import { createContext, useContext, useState, ReactNode } from "react";
+import { UserAuthDto } from "../types/api-types";
 
 interface UserContextType {
   user: UserAuthDto | null;
   setUser: (user: UserAuthDto | null) => void;
+  clearUser: () => void;
 }
 
-const UserContext = createContext<UserContextType>({
-  user: null,
-  setUser: () => {},
-});
+const UserContext = createContext<UserContextType | undefined>(undefined);
 
-export const UserProvider = ({ children }: { children: React.ReactNode }) => {
+export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<UserAuthDto | null>(null);
 
-  useEffect(() => {
-    const stored = localStorage.getItem("user");
-    if (stored) {
-      setUser(JSON.parse(stored));
-    }
-  }, []);
-
-  const updateUser = (user: UserAuthDto | null) => {
-    setUser(user);
-    if (user) {
-      localStorage.setItem("user", JSON.stringify(user));
-    } else {
-      localStorage.removeItem("user");
-    }
-  };
+  const updateUser = (user: UserAuthDto | null) => setUser(user);
+  const clearUser = () => updateUser(null);
 
   return (
-    <UserContext.Provider value={{ user, setUser: updateUser }}>
+    <UserContext.Provider value={{ user, setUser: updateUser, clearUser }}>
       {children}
     </UserContext.Provider>
   );
 };
 
-export const useUser = () => useContext(UserContext);
+export const useUser = (): UserContextType => {
+  const context = useContext(UserContext);
+  if (!context) {
+    throw new Error("useUser must be used within a UserProvider");
+  }
+  return context;
+};

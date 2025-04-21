@@ -1,20 +1,14 @@
-import { useAuth } from "../../store/auth";
 import { useTheme } from "../../lib/theme";
-import { useNavigate } from "react-router-dom";
 import { ThemeName } from "../../lib/theme";
 import HomeworkSettingsPanel from "./HomeworkSettingsPanel";
 import { useState } from "react";
+import LogoutButton from "../LogoutButton";
 
 
 const SettingsPanel = () => {
-  const { logout } = useAuth();
   const { theme, setTheme } = useTheme();
-  const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
-    navigate("/");
-  };
+
 
   const [taskLimit, setTaskLimit] = useState(() => {
     const saved = localStorage.getItem("taskLimit");
@@ -59,12 +53,7 @@ const SettingsPanel = () => {
         </select>
       </div>
 
-      <button
-        onClick={handleLogout}
-        className="w-full mt-4 bg-red-500 text-text_light py-2 rounded hover:bg-red-600"
-      >
-        🚪 Выйти из аккаунта
-      </button>
+      <LogoutButton />
     </div>
   );
 };

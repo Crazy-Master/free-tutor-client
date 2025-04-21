@@ -114,18 +114,6 @@ const RegistrationPage = () => {
         dictionaryService.reset();
       }
 
-      const payload = JSON.parse(atob(data.tokenString.split(".")[1]));
-      const userRole = payload.role;
-
-      if (userRole === "student") {
-        navigate("/student");
-      } else if (userRole === "teacher") {
-        navigate("/teacher");
-      } else if (userRole === "admin") {
-        navigate("/admin");
-      } else {
-        navigate("/");
-      }
     } catch (err) {
       setError("Ошибка подключения к серверу." + err);
     } finally {

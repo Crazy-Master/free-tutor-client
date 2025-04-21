@@ -172,3 +172,15 @@ export interface UpdateStudentToTeacherInfoDto {
   id: number;
   information: Partial<StudentInfoDto>;
 }
+
+export interface UserInfoDto {
+  lastDisciplineId: number;
+  studentIds: number[];
+  notes: Record<number, string>;
+}
+
+export interface UserAuthDto {
+  email: string;
+  lastActiveAt: string | null;
+  information: UserInfoDto;
+}
