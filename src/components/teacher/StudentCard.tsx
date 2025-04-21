@@ -4,12 +4,13 @@ import { StudentCardInfoDto } from "./StudentList";
 interface Props {
   student: StudentCardInfoDto;
   onDelete: () => void;
+  onOpen: () => void;
 }
 
-const StudentCard: React.FC<Props> = ({ student, onDelete }) => {
+const StudentCard: React.FC<Props> = ({ student, onDelete, onOpen }) => {
   return (
     <div className="flex items-center justify-between border-b py-2 px-3 bg-primary/10 rounded mb-2">
-      <div>
+      <div className="cursor-pointer" onClick={onOpen}>
         <p className="font-semibold text-sm">
           id:{student.studentId} – {student.login}
         </p>

@@ -117,3 +117,58 @@ export interface UpdateGroupNumberDto {
   groupNumber: number;
 }
 
+export interface UserInfoExtendedDto {
+  lastActiveAt: string | null;
+}
+
+export interface TaskInfo {
+  taskId: number;
+  wrongAttempts: number;
+}
+
+export interface TaskHome {
+  taskId: number;
+  wrongAttempts: number;
+  assignedAt: string;
+}
+
+export interface HomeworkInfo {
+  idHomework: number;
+  assignedAt: string;
+  completedAt?: string | null;
+  taskIds: { id: number; type: TaskType }[];
+  type: HomeworkType;
+}
+
+export enum HomeworkType {
+  Classic = "Classic",
+  Test = "Test",
+}
+
+export enum TaskType {
+  Forced = "Forced",
+  AvailableUnsolved = "AvailableUnsolved",
+  Group1 = "Group1",
+  Group2 = "Group2",
+  Group3 = "Group3",
+}
+
+export interface StudentInfoDto {
+  completedTopicIds: number[];
+  useTaskIds: TaskInfo[];
+  lessonTaskIds: TaskHome[];
+  group1TaskIds: number[];
+  group2TaskIds: TaskHome[];
+  group3TaskIds: TaskHome[];
+  availableUnsolvedTaskIds: number[];
+  homeworks: HomeworkInfo[];
+  inProgressHomeworks: HomeworkInfo[];
+  completedHomeworks: HomeworkInfo[];
+  analyzeInLessonTaskIds: number[];
+  contIdHomework: number;
+}
+
+export interface UpdateStudentToTeacherInfoDto {
+  id: number;
+  information: Partial<StudentInfoDto>;
+}

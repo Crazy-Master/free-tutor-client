@@ -14,6 +14,7 @@ interface StudentListProps {
   loading?: boolean;
   students: StudentCardInfoDto[];
   onDelete: (id: number) => void;
+  onOpenStudent: (studentId: number) => void;
   footer?: React.ReactNode;
   maxHeight?: string;
 }
@@ -23,6 +24,7 @@ const StudentList: React.FC<StudentListProps> = ({
   loading = false,
   students,
   onDelete,
+  onOpenStudent,
   footer,
   maxHeight = "400px",
 }) => {
@@ -36,9 +38,7 @@ const StudentList: React.FC<StudentListProps> = ({
         <p>Загрузка учеников...</p>
       ) : (
         <div
-          className={`border rounded p-4 relative ${
-            students.length > 4 ? "overflow-y-auto" : ""
-          }`}
+          className={`border rounded p-4 relative ${students.length > 4 ? "overflow-y-auto" : ""}`}
           style={{ maxHeight }}
         >
           {students.length === 0 ? (
@@ -49,6 +49,7 @@ const StudentList: React.FC<StudentListProps> = ({
                 key={student.id}
                 student={student}
                 onDelete={() => setToDelete(student)}
+                onOpen={() => onOpenStudent(student.studentId)}
               />
             ))
           )}

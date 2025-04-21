@@ -3,9 +3,11 @@ import { UserInfoDto } from "../store/user";
 import {
   DisciplineDto,
   StudentCardInfoDto,
+  StudentInfoDto,
   StudentToTeacherDto,
   UpdateGroupNumberDto,
   UpdateShortAnswerDto,
+  UserInfoExtendedDto,
 } from "../types/api-types";
 import { PagedResultDto, TaskDto, TaskFilterDto } from "../types/api-types";
 import {
@@ -187,4 +189,18 @@ export const api = {
   
   updateGroupNumber: (dto: UpdateGroupNumberDto) =>
     request<void>(`/api/tasks/update-group-number`, "PUT", dto),
+
+  getUserInfo: (userId: number) =>
+    request<UserInfoExtendedDto>(`/api/users/information/${userId}`),
+  
+  getStudentInfo: (studentId: number) =>
+    request<StudentInfoDto>(`/api/student-to-teacher/teacher-info/${studentId}`),
+  
+  updateStudentCompletedTopics: (studentId: number, topicIds: number[]) =>
+    request<void>("/api/student-to-teacher/teacher-info-only", "PUT", {
+      id: studentId,
+      information: {
+        completedTopicIds: topicIds,
+      },
+    }),
 };

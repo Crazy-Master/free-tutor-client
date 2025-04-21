@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useUser } from "../store/user";
 import { useUserInfoFromToken } from "../hooks/useUserInfoFromToken";
 import { useDisciplineStore } from "../store/disciplineStore";
@@ -8,66 +8,39 @@ import ActionPanel from "../components/teacher/ActionPanel";
 import SettingsPanel from "../components/teacher/SettingsPanel";
 import AddStudentGroupModal from "../components/modals/AddStudentGroupModal";
 import { useNavigate } from "react-router-dom";
-
-interface StudentCardInfoDto {
-  id: number;
-  studentId: number;
-  login: string;
-  lastActiveAt: string | null;
-}
+import { useStudentStore } from "../store/studentStore";
+import { useLoadStudents } from "../hooks/useLoadStudents";
 
 const TeacherPage = () => {
   const { user } = useUser();
   const userInfo = useUserInfoFromToken();
   const navigate = useNavigate();
-
   const { disciplineId } = useDisciplineStore();
+  const { students, setStudents } = useStudentStore();
 
-  const [students, setStudents] = useState<StudentCardInfoDto[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [loadingStudents, setLoadingStudents] = useState(false);
-  const [error, setError] = useState("");
   const [panelView, setPanelView] = useState<"students" | "profile" | "settings">("students");
 
-  useEffect(() => {
-    if (!disciplineId) return;
-
-    const fetchStudents = async () => {
-      try {
-        setLoadingStudents(true);
-        const data = await api.getStudents(disciplineId);
-        setStudents(data);
-      } catch (e) {
-        if (e instanceof Error) {
-          console.error("Ошибка API:", e.message);
-          setError("Ошибка загрузки списка учеников." + error);
-        }
-      } finally {
-        setLoadingStudents(false);
-      }
-    };
-
-    fetchStudents();
-  }, [disciplineId, error]);
+  const { loading } = useLoadStudents();
 
   return (
     <div className="min-h-screen bg-background text-text">
       <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Левая колонка */}
         <div>
           {panelView === "students" && (
             <StudentList
               students={students}
-              loading={loadingStudents}
+              loading={loading}
               onDelete={async (id) => {
                 try {
                   await api.deleteStudentLink(id);
-                  setStudents((prev) => prev.filter((s) => s.id !== id));
+                  setStudents(students.filter((s) => s.id !== id));
                 } catch (e) {
                   if (e instanceof Error)
-                    setError("Ошибка удаления: " + e.message);
+                    console.error("Ошибка удаления: " + e.message);
                 }
               }}
+              onOpenStudent={(id) => navigate(`/student/${id}`)}
               footer={
                 <button
                   onClick={() => setShowAddModal(true)}
@@ -91,7 +64,6 @@ const TeacherPage = () => {
           {panelView === "settings" && <SettingsPanel />}
         </div>
 
-        {/* Правая колонка */}
         <ActionPanel
           onShowStudents={() => setPanelView("students")}
           onShowProfile={() => setPanelView("profile")}
@@ -105,7 +77,7 @@ const TeacherPage = () => {
           disciplineId={disciplineId}
           onClose={() => setShowAddModal(false)}
           onSuccess={(newStudent) =>
-            setStudents((prev) => [...prev, newStudent])
+            setStudents([...students, newStudent])
           }
         />
       )}

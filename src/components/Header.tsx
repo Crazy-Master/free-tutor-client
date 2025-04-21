@@ -1,23 +1,26 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { useDisciplineStore } from "../store/disciplineStore";
-import { DisciplineDto } from "../types/api-types";
-import { api } from "../lib/api";
-import { useNavigate, useLocation } from "react-router-dom";
-import { UserInfoDto, useUser } from "../store/user";
-import PopupConfirm from "./ui/PopupConfirm";
+import { useUser } from "../store/user";
 import { useUserInfoFromToken } from "../hooks/useUserInfoFromToken";
+import PopupConfirm from "./ui/PopupConfirm";
+import { api } from "../lib/api";
+import { DisciplineDto } from "../types/api-types";
+import { useStudentStore } from "../store/studentStore";
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { studentId } = useParams();
+  const { getStudentById } = useStudentStore();
+  const studentCard = studentId ? getStudentById(+studentId) : null;
+
   const { disciplineId, setDisciplineId } = useDisciplineStore();
   const { user, setUser } = useUser();
   const userInfo = useUserInfoFromToken();
 
   const [disciplines, setDisciplines] = useState<DisciplineDto[]>([]);
-  const [pendingDisciplineId, setPendingDisciplineId] = useState<number | null>(
-    null
-  );
+  const [pendingDisciplineId, setPendingDisciplineId] = useState<number | null>(null);
 
   const showBackButton = location.pathname !== "/teacher";
   const isTasksPage = location.pathname === "/tasks";
@@ -29,7 +32,7 @@ const Header: React.FC = () => {
   const confirmDisciplineChange = async () => {
     if (!user?.information || !pendingDisciplineId) return;
 
-    const updatedInfo: UserInfoDto = {
+    const updatedInfo = {
       ...user.information,
       lastDisciplineId: pendingDisciplineId,
     };
@@ -38,17 +41,6 @@ const Header: React.FC = () => {
     setDisciplineId(pendingDisciplineId);
     setUser({ ...user, information: updatedInfo });
     setPendingDisciplineId(null);
-  };
-
-  const cancelDisciplineChange = () => {
-    setPendingDisciplineId(null);
-  };
-
-  const handleDisciplineChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newId = parseInt(e.target.value);
-    if (newId !== disciplineId) {
-      setPendingDisciplineId(newId);
-    }
   };
 
   return (
@@ -65,15 +57,12 @@ const Header: React.FC = () => {
 
         {!isTasksPage && (
           <>
-            <label className="text-sm mr-2"></label>
             <select
               value={disciplineId ?? ""}
-              onChange={handleDisciplineChange}
+              onChange={(e) => setPendingDisciplineId(parseInt(e.target.value))}
               className="border px-3 py-1 rounded text-black"
             >
-              <option value="" disabled>
-                Выберите дисциплину
-              </option>
+              <option value="" disabled>Выберите дисциплину</option>
               {disciplines.map((d) => (
                 <option key={d.disciplineId} value={d.disciplineId}>
                   {d.typeExam} - {d.discipline}
@@ -81,6 +70,14 @@ const Header: React.FC = () => {
               ))}
             </select>
           </>
+        )}
+      </div>
+
+      <div className="flex-1 text-center">
+        {location.pathname.startsWith("/student/") && studentCard && (
+          <span className="text-sm">
+            ID: {studentCard.studentId} — {studentCard.login}
+          </span>
         )}
       </div>
 
@@ -92,12 +89,9 @@ const Header: React.FC = () => {
 
       {pendingDisciplineId && (
         <PopupConfirm
-          message={`Вы уверены, что хотите сменить дисциплину на "${
-            disciplines.find((d) => d.disciplineId === pendingDisciplineId)
-              ?.discipline ?? "выбранную"
-          }"?`}
+          message={`Вы уверены, что хотите сменить дисциплину?`}
           onConfirm={confirmDisciplineChange}
-          onCancel={cancelDisciplineChange}
+          onCancel={() => setPendingDisciplineId(null)}
         />
       )}
     </header>
