@@ -4,6 +4,7 @@ import { api } from "../../lib/api";
 import { StudentCardInfoDto } from "../../types/api-types";
 import PopupConfirm from "../ui/PopupConfirm";
 import ErrorBox from "../ui/ErrorBox";
+import { createEmptyStudentInfo } from "../../utils/createEmptyStudentInfo";
 
 
 interface Props {
@@ -48,7 +49,7 @@ const AddStudentGroupModal = ({ disciplineId, onClose, onSuccess }: Props) => {
         studentId: parsedId,
         teacherId: userInfo.userId,
         disciplineId,
-        information: { notes: {} },
+        information: createEmptyStudentInfo(),
       });
 
       setSuccess(true);
