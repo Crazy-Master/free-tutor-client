@@ -10,6 +10,7 @@ import StudentInfoPage from "../pages/StudentInfoPage";
 import ProtectedRoute from "../lib/ProtectedRoute";
 import Layout from "../components/Layout";
 import RouteGuard from "../lib/RouteGuard";
+import TasksPage from "../pages/TasksPage";
 
 export const appRoutes: RouteObject[] = [
   {
@@ -48,6 +49,14 @@ export const appRoutes: RouteObject[] = [
         element: (
           <RouteGuard role="admin">
             <AdminPage />
+          </RouteGuard>
+        ),
+      },
+      {
+        path: "/tasks",
+        element: (
+          <RouteGuard role="teacher">
+            <TasksPage />
           </RouteGuard>
         ),
       },

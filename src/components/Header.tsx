@@ -1,12 +1,11 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { useDisciplineStore } from "../store/disciplineStore";
-import { useUser } from "../store/user";
-import { useUserInfoFromToken } from "../hooks/useUserInfoFromToken";
+import { useUserInfo } from "../hooks/useUserInfo";
+import { useStudentStore } from "../store/studentStore";
 import PopupConfirm from "./ui/PopupConfirm";
 import { api } from "../lib/api";
 import { DisciplineDto } from "../types/api-types";
-import { useStudentStore } from "../store/studentStore";
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
@@ -16,9 +15,8 @@ const Header: React.FC = () => {
   const studentCard = studentId ? getStudentById(+studentId) : null;
 
   const { disciplineId, setDisciplineId } = useDisciplineStore();
-  const { user, setUser } = useUser();
-  const userInfo = useUserInfoFromToken();
-
+  const userInfo = useUserInfo(); 
+  
   const [disciplines, setDisciplines] = useState<DisciplineDto[]>([]);
   const [pendingDisciplineId, setPendingDisciplineId] = useState<number | null>(null);
 
@@ -30,16 +28,15 @@ const Header: React.FC = () => {
   }, []);
 
   const confirmDisciplineChange = async () => {
-    if (!user?.information || !pendingDisciplineId) return;
+    if (!userInfo || !userInfo.user || !pendingDisciplineId) return;
 
     const updatedInfo = {
-      ...user.information,
+      ...userInfo.user.information,
       lastDisciplineId: pendingDisciplineId,
     };
 
     await api.updateUserInfo(updatedInfo);
     setDisciplineId(pendingDisciplineId);
-    setUser({ ...user, information: updatedInfo });
     setPendingDisciplineId(null);
   };
 
@@ -56,20 +53,20 @@ const Header: React.FC = () => {
         )}
 
         {!isTasksPage && (
-          <>
-            <select
-              value={disciplineId ?? ""}
-              onChange={(e) => setPendingDisciplineId(parseInt(e.target.value))}
-              className="border px-3 py-1 rounded text-black"
-            >
-              <option value="" disabled>Выберите дисциплину</option>
-              {disciplines.map((d) => (
-                <option key={d.disciplineId} value={d.disciplineId}>
-                  {d.typeExam} - {d.discipline}
-                </option>
-              ))}
-            </select>
-          </>
+          <select
+            value={disciplineId ?? ""}
+            onChange={(e) => setPendingDisciplineId(parseInt(e.target.value))}
+            className="border px-3 py-1 rounded text-black"
+          >
+            <option value="" disabled>
+              Выберите дисциплину
+            </option>
+            {disciplines.map((d) => (
+              <option key={d.disciplineId} value={d.disciplineId}>
+                {d.typeExam} - {d.discipline}
+              </option>
+            ))}
+          </select>
         )}
       </div>
 
@@ -82,9 +79,11 @@ const Header: React.FC = () => {
       </div>
 
       <div className="flex items-center gap-4">
-        <span className="text-sm cursor-pointer">
-          ID: {userInfo?.userId} – {userInfo?.login} – {userInfo?.role}
-        </span>
+        {userInfo && (
+          <span className="text-sm cursor-pointer">
+            ID: {userInfo.userId} – {userInfo.login} – {userInfo.role}
+          </span>
+        )}
       </div>
 
       {pendingDisciplineId && (

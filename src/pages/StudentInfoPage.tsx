@@ -36,10 +36,10 @@ const StudentInfoPage = () => {
 
       {/* Панель кнопок */}
       <div className="flex flex-wrap gap-2 p-4 border-b bg-gray-50">
-        <button onClick={() => setActivePanel("studentInfo")}>👤 Информация</button>
+        <button onClick={() => setActivePanel("studentInfo")}>👤 Информация о студенте</button>
         <button onClick={() => setActivePanel("completedTopics")}>📚 Пройденные темы</button>
-        <button onClick={() => setActivePanel("createHomework")}>📝 Домашка</button>
-        <button onClick={() => setActivePanel("unclearTasks")}>❓ Непонятные</button>
+        <button onClick={() => setActivePanel("createHomework")}>📝 Сформировать ДЗ</button>
+        <button onClick={() => setActivePanel("unclearTasks")}>❓ Непонятные задачи</button>
         <button onClick={() => setActivePanel("markCompleted")}>✅ Пройденные задачи</button>
         <button onClick={() => setActivePanel("viewHomework")}>📂 Посмотреть ДЗ</button>
         <button disabled className="opacity-50 cursor-not-allowed">🔒 Урок (в разработке)</button>

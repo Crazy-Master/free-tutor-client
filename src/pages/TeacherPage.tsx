@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useUser } from "../store/user";
-import { useUserInfoFromToken } from "../hooks/useUserInfoFromToken";
 import { useDisciplineStore } from "../store/disciplineStore";
 import { api } from "../lib/api";
 import StudentList from "../components/teacher/StudentList";
@@ -10,10 +9,11 @@ import AddStudentGroupModal from "../components/modals/AddStudentGroupModal";
 import { useNavigate } from "react-router-dom";
 import { useStudentStore } from "../store/studentStore";
 import { useLoadStudents } from "../hooks/useLoadStudents";
+import { useUserInfo } from "../hooks/useUserInfo";
 
 const TeacherPage = () => {
   const { user } = useUser();
-  const userInfo = useUserInfoFromToken();
+  const userInfo = useUserInfo();
   const navigate = useNavigate();
   const { disciplineId } = useDisciplineStore();
   const { students, setStudents } = useStudentStore();
