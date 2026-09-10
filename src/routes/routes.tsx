@@ -63,5 +63,5 @@ export const appRoutes: RouteObject[] = [
     ],
   },
 
-  { path: "/student/:studentId", element: <StudentInfoPage /> },
+  { path: "/student/:studentId", element: <ProtectedRoute><RouteGuard role="teacher"><StudentInfoPage /></RouteGuard></ProtectedRoute> },
 ];

@@ -3,6 +3,11 @@ import { useDictionaryStore } from "./dictionaryStore";
 import { dictionaryService } from "../services/dictionaryService";
 
 
+const readDiscipline = () => {
+  try { const id = Number(localStorage.getItem("selectedDisciplineId")); return id > 0 ? id : null; }
+  catch { return null; }
+};
+
 interface DisciplineStore {
    disciplineId: number | null;
    setDisciplineId: (id: number) => void;
@@ -10,10 +15,10 @@ interface DisciplineStore {
   }
   
   export const useDisciplineStore = create<DisciplineStore>((set) => ({
-    disciplineId: parseInt(localStorage.getItem("selectedDisciplineId") ?? "0"),
+    disciplineId: readDiscipline(),
   
     setDisciplineId: (id: number) => {
-      localStorage.setItem("selectedDisciplineId", id.toString());
+      try { localStorage.setItem("selectedDisciplineId", id.toString()); } catch { /* memory state still works */ }
       set({ disciplineId: id });
   
       dictionaryService.reset();
@@ -21,7 +26,7 @@ interface DisciplineStore {
     },
   
     clearDiscipline: () => {
-      localStorage.removeItem("selectedDisciplineId");
+      try { localStorage.removeItem("selectedDisciplineId"); } catch { /* memory state still works */ }
       set({ disciplineId: null });
     },
     }));

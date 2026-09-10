@@ -1,4 +1,4 @@
-import { getToken } from "../store/auth";
+import { request, authClient } from "./http";
 import {
   DisciplineDto,
   StudentCardInfoDto,
@@ -17,42 +17,8 @@ import {
   TypeResponseDto,
 } from "../types/api-types";
 
-const BASE_URL = "https://api-tutor-master.ru";
-
-const request = async <T>(
-  url: string,
-  method: "GET" | "POST" | "PUT" | "DELETE" = "GET",
-  body?: unknown
-): Promise<T> => {
-  const token = getToken();
-  const headers: HeadersInit = {
-    "Content-Type": "application/json",
-  };
-
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-
-  console.log(`[API CALL] ${method} ${url}`);
-
-  const res = await fetch(`${BASE_URL}${url}`, {
-    method,
-    headers,
-    body: body ? JSON.stringify(body) : undefined,
-  });
-
-  if (!res.ok) {
-    const errorText = await res.text();
-    throw new Error(errorText || "Ошибка API");
-  }
-
-  try {
-    return await res.json();
-  } catch {
-    return {} as T;
-  }
-};
-
 export const api = {
-  getDisciplines: () => request<DisciplineDto[]>("/api/disciplines"),
+  getDisciplines: () => request<DisciplineDto[]>("/api/disciplines", "GET", undefined, { auth: false }),
 
   getStudents: (disciplineId: number) =>
     request<StudentCardInfoDto[]>(
@@ -97,23 +63,7 @@ export const api = {
 
     if (filter.pageSize) query.append("pageSize", filter.pageSize.toString());
 
-    const res = await fetch(
-      `https://api-tutor-master.ru/api/tasks?${query.toString()}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
-
-    if (!res.ok) {
-      throw new Error("Ошибка загрузки задач");
-    }
-
-    const data: PagedResultDto<TaskDto> = await res.json();
-    return data;
+    return request<PagedResultDto<TaskDto>>(`/api/tasks?${query.toString()}`);
   },
 
   getTaskTags: (userId?: number) => {
@@ -171,20 +121,8 @@ export const api = {
   getTopicNamesByTaskId: (taskId: number) =>
     request<string[]>(`/api/topics/by-task/${taskId}`),
 
-  getTypeResponseNameByTaskId: async (taskId: number) => {
-    const res = await fetch(
-      `${BASE_URL}/api/type-responses/by-task/${taskId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-        },
-      }
-    );
-
-    if (!res.ok) throw new Error((await res.text()) || "Ошибка API");
-
-    return res.text();
-  },
+  getTypeResponseNameByTaskId: (taskId: number) =>
+    request<string>(`/api/type-responses/by-task/${taskId}`, "GET", undefined, { format: "text" }),
 
   updateShortAnswer: (dto: UpdateShortAnswerDto) =>
     request<void>(`/api/tasks/update-short-answer`, "PUT", dto),
@@ -208,9 +146,5 @@ export const api = {
       },
     }),
 
-  logout: () =>
-    fetch("https://api-tutor-master.ru/api/auth/logout", {
-      method: "POST",
-      credentials: "include",
-    }),
+  logout: authClient.logout,
 };

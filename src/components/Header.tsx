@@ -6,9 +6,12 @@ import { useStudentStore } from "../store/studentStore";
 import PopupConfirm from "./ui/PopupConfirm";
 import { api } from "../lib/api";
 import { DisciplineDto } from "../types/api-types";
+import { useUser } from "../store/user";
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
+  const { setUser } = useUser();
+  const [error, setError] = useState<string | null>(null);
   const location = useLocation();
   const { studentId } = useParams();
   const { getStudentById } = useStudentStore();
@@ -24,7 +27,10 @@ const Header: React.FC = () => {
   const isTasksPage = location.pathname === "/tasks";
 
   useEffect(() => {
-    api.getDisciplines().then(setDisciplines);
+    let cancelled = false;
+    void api.getDisciplines().then(data => { if (!cancelled) setDisciplines(data); })
+      .catch(error => { if (!cancelled) setError(error instanceof Error ? error.message : "Не удалось загрузить дисциплины."); });
+    return () => { cancelled = true; };
   }, []);
 
   const confirmDisciplineChange = async () => {
@@ -35,9 +41,15 @@ const Header: React.FC = () => {
       lastDisciplineId: pendingDisciplineId,
     };
 
-    await api.updateUserInfo(updatedInfo);
-    setDisciplineId(pendingDisciplineId);
-    setPendingDisciplineId(null);
+    try {
+      await api.updateUserInfo(updatedInfo);
+      setUser({ ...userInfo.user, information: updatedInfo });
+      setDisciplineId(pendingDisciplineId);
+      setPendingDisciplineId(null);
+      setError(null);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Не удалось сменить дисциплину.");
+    }
   };
 
   return (
@@ -86,6 +98,7 @@ const Header: React.FC = () => {
         )}
       </div>
 
+      {error && <p role="alert" className="text-sm max-w-xs">{error}</p>}
       {pendingDisciplineId && (
         <PopupConfirm
           message={`Вы уверены, что хотите сменить дисциплину?`}

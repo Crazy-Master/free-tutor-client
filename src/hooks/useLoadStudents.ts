@@ -13,23 +13,27 @@ export const useLoadStudents = () => {
   useEffect(() => {
     if (!disciplineId) return;
 
-    const fetch = async () => {
+    let cancelled = false;
+    const load = async () => {
       try {
         setLoading(true);
         const data = await api.getStudents(disciplineId);
+        if (cancelled) return;
         setStudents(data);
         setError(null);
       } catch (e) {
+        if (cancelled) return;
         if (e instanceof Error) {
           console.error("Ошибка API:", e.message);
-          setError("Ошибка загрузки учеников.");
+          setError(e.message);
         }
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
-    fetch();
+    void load();
+    return () => { cancelled = true; };
   }, [disciplineId, setStudents]);
 
   return { loading, error };

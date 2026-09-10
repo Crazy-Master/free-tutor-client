@@ -2,9 +2,10 @@ import { useState } from "react";
 import { useAuth } from "../store/auth";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
-import { useUser } from "../store/user";
+import { authClient } from "../lib/http";
+import { Navigate } from "react-router-dom";
 import ErrorBox from "../components/ui/ErrorBox";
-import { useDisciplineStore } from "../store/disciplineStore";
+
 import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
@@ -13,9 +14,7 @@ const LoginPage = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const { login: saveToken } = useAuth();
-  const { setUser } = useUser();
-  const { setDisciplineId } = useDisciplineStore();
+  const session = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -24,39 +23,16 @@ const LoginPage = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("https://api-tutor-master.ru/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ login, password }),
-      });
-
-      if (response.status === 401) {
-        setError("Неверный логин или пароль");
-        return;
-      }
-
-      if (!response.ok) {
-        setError("Ошибка сервера. Попробуйте позже.");
-        return;
-      }
-
-      const data = await response.json();
-      saveToken(data.tokenString);
-      setUser(data.userAuthDto);
-
-      const lastId = data.userAuthDto.information?.lastDisciplineId;
-      if (lastId) {
-        setDisciplineId(lastId);
-      }
-
-      // 👇 Переход к "/" => сработает ProtectedRoute
+      await authClient.authenticate("/api/auth/login", { login, password });
       navigate("/");
     } catch (err) {
-      setError("Сервер недоступен. Проверьте подключение. Ошибка:" + err);
+      setError(err instanceof Error ? err.message : "Не удалось войти.");
     } finally {
       setIsLoading(false);
     }
   };
+
+  if (session.status === "authenticated") return <Navigate to="/" replace />;
 
   return (
     <div className="min-h-screen bg-background flex justify-center items-center text-text">
@@ -88,7 +64,7 @@ const LoginPage = () => {
                 required
               />
             </div>
-            {error && <ErrorBox message={error} />}
+            {(error || session.error) && <ErrorBox message={error || session.error || ""} />}
             <Button type="submit" className="w-full">Войти</Button>
             <div className="text-sm mt-2 text-center">
               Ещё нет аккаунта?{" "}

@@ -1,7 +1,7 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../store/auth";
 import { JSX } from "react";
-import { useUserInfo } from "../hooks/useUserInfo";
+import { useUserInfoFromToken } from "../hooks/useUserInfoFromToken";
 
 interface ProtectedRouteProps {
   children: JSX.Element;
@@ -9,7 +9,7 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const { token } = useAuth();
-  const userInfo = useUserInfo();
+  const userInfo = useUserInfoFromToken();
   const location = useLocation();
   if (!token) {
     return <Navigate to="/login" replace />;

@@ -5,12 +5,14 @@ import Pagination from "../components/common/Pagination";
 import { TaskDto, TaskFilterDto, PagedResultDto } from "../types/api-types";
 import { mapTaskDtoToCardTask } from "../lib/mapTaskDtoToCardTask";
 import { api } from "../lib/api";
+import ErrorBox from "../components/ui/ErrorBox";
 
 const TasksPage: React.FC = () => {
 
 
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<TaskFilterDto | null>(null);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
@@ -21,13 +23,14 @@ const TasksPage: React.FC = () => {
 
     try {
       setLoading(true);
+      setError(null);
       const result: PagedResultDto<TaskDto> = await api.getTasks(usedFilter);
       setTasks(result.items.map(mapTaskDtoToCardTask));
       const total = Math.ceil(result.totalCount / result.pageSize);
       setTotalPages(total);
       setCurrentPage(result.pageNumber);
     } catch (e) {
-      console.error("Ошибка загрузки задач:", e);
+      setError(e instanceof Error ? e.message : "Не удалось загрузить задачи.");
     } finally {
       setLoading(false);
     }
@@ -58,6 +61,7 @@ const TasksPage: React.FC = () => {
 
       <main className="flex-1 p-6 space-y-4">
         <TaskFilterPanel onSearch={handleSearch} onReset={handleReset} />
+        {error && <ErrorBox message={error} />}
         <TaskList tasks={tasks} loading={loading} />
       </main>
 

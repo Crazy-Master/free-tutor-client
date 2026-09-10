@@ -1,33 +1,15 @@
-import { useAuth } from "../store/auth";
-import { useUser } from "../store/user";
-import { useNavigate } from "react-router-dom";
-import { api } from "../lib/api";
+import { useState } from "react";
+import { authClient } from "../lib/http";
 
 const LogoutButton = () => {
-  const { logout } = useAuth();
-  const { clearUser } = useUser();
-  const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    try {
-      await api.logout();
-    } catch (e) {
-      console.warn("Ошибка выхода:", e);
-    }
-
-    logout();
-    clearUser();
-    navigate("/"); 
-  };
-
+  const [loading, setLoading] = useState(false);
   return (
-    <button
-      onClick={handleLogout}
-      className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-    >
-      🔒 Выйти
+    <button disabled={loading} onClick={() => {
+      setLoading(true);
+      void authClient.logout();
+    }} className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50">
+      {loading ? "Выход…" : "🔒 Выйти"}
     </button>
   );
 };
-
 export default LogoutButton;

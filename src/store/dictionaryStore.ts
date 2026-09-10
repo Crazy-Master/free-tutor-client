@@ -9,6 +9,7 @@ import {
 import { api } from "../lib/api";
 
 interface DictionaryStore {
+  clear: () => void;
   taskTags: TaskTagDto[];
   topics: TopicDto[];
   testNumbers: TestNumberDto[];
@@ -35,6 +36,8 @@ interface DictionaryStore {
 }
 
 export const useDictionaryStore = create<DictionaryStore>((set, get) => ({
+  clear: () => set({ taskTags: [], topics: [], testNumbers: [], typeResponses: [], disciplines: [], taskMap: {},
+    loadedTaskTags: false, loadedTopics: false, loadedTestNumbers: false, loadedTypeResponses: false }),
   taskTags: [],
   topics: [],
   testNumbers: [],
@@ -49,7 +52,7 @@ export const useDictionaryStore = create<DictionaryStore>((set, get) => ({
   setTaskTags: (tags) => set({ taskTags: tags, loadedTaskTags: true }),
   setTopics: (t) => set({ topics: t, loadedTopics: true }),
   setTestNumbers: (t) => set({ testNumbers: t, loadedTestNumbers: true }),
-  setTypeResponses: (t) => set({ typeResponses: t, loadedTopics: true }),
+  setTypeResponses: (t) => set({ typeResponses: t, loadedTypeResponses: true }),
   setDisciplines: (d) => set({ disciplines: d }),
 
   resetDisciplineDependentData: () =>

@@ -1,25 +1,21 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../store/auth";
-import { useUser } from "../store/user";
-import { useDisciplineStore } from "../store/disciplineStore";
-import { dictionaryService } from "../services/dictionaryService";
+import { authClient } from "../lib/http";
+import { api } from "../lib/api";
+import type { DisciplineDto } from "../types/api-types";
+import { Navigate } from "react-router-dom";
+
+
 
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import ErrorBox from "../components/ui/ErrorBox";
 
-interface DisciplineDto {
-  disciplineId: number;
-  discipline: string;
-  typeExam: string;
-}
 
 const RegistrationPage = () => {
   const navigate = useNavigate();
-  const { login: saveToken } = useAuth();
-  const { setUser } = useUser();
-  const { setDisciplineId } = useDisciplineStore();
+  const session = useAuth();
 
   const [login, setLogin] = useState("");
   const [email, setEmail] = useState("");
@@ -33,19 +29,15 @@ const RegistrationPage = () => {
   const [loading, setLoading] = useState(false);
 
   const isPasswordValid = /^(?=.*[A-Z])(?=.*\d).{6,}$/.test(password);
+  const withinPasswordByteLimit = new TextEncoder().encode(password).length <= 72;
   const isPasswordMatch = password === confirmPassword;
 
   useEffect(() => {
     const fetchDisciplines = async () => {
       try {
-        const response = await fetch(
-          "https://api-tutor-master.ru/api/disciplines"
-        );
-        if (!response.ok) throw new Error("Ошибка загрузки дисциплин");
-        const data = await response.json();
-        setDisciplines(data);
+        setDisciplines(await api.getDisciplines());
       } catch (err) {
-        console.error(err);
+        setError(err instanceof Error ? err.message : "Не удалось загрузить дисциплины.");
       }
     };
 
@@ -56,9 +48,9 @@ const RegistrationPage = () => {
     e.preventDefault();
     setError("");
 
-    if (!isPasswordValid) {
+    if (!isPasswordValid || !withinPasswordByteLimit) {
       setError(
-        "Пароль должен содержать минимум 6 символов, одну заглавную букву и одну цифру."
+        "Пароль должен содержать минимум 6 символов, одну заглавную букву и одну цифру; не более 72 байт UTF-8."
       );
       return;
     }
@@ -77,49 +69,19 @@ const RegistrationPage = () => {
         notes: {},
       };
 
-      const response = await fetch(
-        "https://api-tutor-master.ru/api/users/register",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            login,
-            email,
-            password,
-            role: role === "student" ? 0 : 1,
-            information,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        let errorMsg = "Ошибка регистрации.";
-        try {
-          const data = await response.json();
-          if (data?.message) errorMsg = data.message;
-        } catch {
-          // Игнорируем ошибку парсинга (ответ пустой)
-          }
-        setError(errorMsg);
-        return;
-      }
-
-      const data = await response.json();
-      saveToken(data.tokenString);
-      setUser(data.userAuthDto);
-
-      const lastId = data.userAuthDto.information?.lastDisciplineId;
-      if (lastId) {
-        setDisciplineId(lastId);
-        dictionaryService.reset();
-      }
+      await authClient.authenticate("/api/users/register", {
+        login, email, password, role: role === "student" ? 0 : 1, information,
+      });
+      navigate("/");
 
     } catch (err) {
-      setError("Ошибка подключения к серверу." + err);
+      setError(err instanceof Error ? err.message : "Не удалось зарегистрироваться.");
     } finally {
       setLoading(false);
     }
   };
+
+  if (session.status === "authenticated") return <Navigate to="/" replace />;
 
   return (
     <div className="min-h-screen bg-background text-text flex justify-center items-center px-4">
