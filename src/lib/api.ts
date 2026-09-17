@@ -1,4 +1,12 @@
 import { request, authClient } from "./http";
+export interface SolutionAccessStatus {
+  taskId: number;
+  taskIdExternal: string;
+  ownPermission: boolean;
+  otherTeacherPermission: boolean;
+  correctAnswer: boolean;
+  hasAccess: boolean;
+}
 import {
   DisciplineDto,
   StudentCardInfoDto,
@@ -18,6 +26,12 @@ import {
 } from "../types/api-types";
 
 export const api = {
+  getSolutionAccess: (relationshipId: number, taskId: number) =>
+    request<SolutionAccessStatus>(`/api/solution-access/${relationshipId}/${taskId}`),
+  grantSolutionAccess: (relationshipId: number, taskId: number) =>
+    request<void>(`/api/solution-access/${relationshipId}/${taskId}`, "PUT"),
+  revokeSolutionAccess: (relationshipId: number, taskId: number) =>
+    request<void>(`/api/solution-access/${relationshipId}/${taskId}`, "DELETE"),
   getDisciplines: () => request<DisciplineDto[]>("/api/disciplines", "GET", undefined, { auth: false }),
 
   getStudents: (disciplineId: number) =>

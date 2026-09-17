@@ -4,11 +4,13 @@ import { api } from "../lib/api";
 import { StudentInfoDto } from "../types/api-types";
 import Header from "../components/Header";
 import CompletedTopicsPanel from "../components/studentCard/CompletedTopicsPanel";
+import SolutionAccessPanel from "../components/studentCard/SolutionAccessPanel";
 import StudentBasicInfoPanel from "../components/studentCard/StudentBasicInfoPanel";
 import { useStudentStore } from "../store/studentStore";
 
 type Panel =
   | "studentInfo"
+  | "solutionAccess"
   | "completedTopics"
   | "createHomework"
   | "unclearTasks"
@@ -38,6 +40,7 @@ const StudentInfoPage = () => {
       <div className="flex flex-wrap gap-2 p-4 border-b bg-gray-50">
         <button onClick={() => setActivePanel("studentInfo")}>👤 Информация о студенте</button>
         <button onClick={() => setActivePanel("completedTopics")}>📚 Пройденные темы</button>
+        <button onClick={() => setActivePanel("solutionAccess")}>🔑 Доступ к решениям</button>
         <button onClick={() => setActivePanel("createHomework")}>📝 Сформировать ДЗ</button>
         <button onClick={() => setActivePanel("unclearTasks")}>❓ Непонятные задачи</button>
         <button onClick={() => setActivePanel("markCompleted")}>✅ Пройденные задачи</button>
@@ -48,6 +51,9 @@ const StudentInfoPage = () => {
 
       {/* Контент */}
       <div className="p-4">
+        {activePanel === "solutionAccess" && studentId && Number.isSafeInteger(+studentId) && +studentId > 0 && (
+          <SolutionAccessPanel key={studentId} relationshipId={+studentId} />
+        )}
         {activePanel === "studentInfo" && studentCard && (
           <StudentBasicInfoPanel studentCard={studentCard} />
         )}
