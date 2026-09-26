@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { api } from "../lib/api";
-import { StudentInfoDto } from "../types/api-types";
+import { StudentInfoDto, StudentCardInfoDto } from "../types/api-types";
+import { useDisciplineStore } from "../store/disciplineStore";
 import Header from "../components/Header";
 import CompletedTopicsPanel from "../components/studentCard/CompletedTopicsPanel";
 import SolutionAccessPanel from "../components/studentCard/SolutionAccessPanel";
@@ -21,16 +22,42 @@ type Panel =
 
 const StudentInfoPage = () => {
   const { studentId } = useParams<{ studentId: string }>();
-  const { getStudentById } = useStudentStore();
-  const studentCard = studentId ? getStudentById(+studentId) : null;
+  const disciplineId = useDisciplineStore(s => s.disciplineId);
+  return <StudentInfoContent key={`${studentId}:${disciplineId}`} studentId={studentId} disciplineId={disciplineId} />;
+};
+
+const StudentInfoContent = ({ studentId, disciplineId }: { studentId?: string; disciplineId: number | null }) => {
+  const [studentCard, setStudentCard] = useState<StudentCardInfoDto | null>(null);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [retry, setRetry] = useState(0);
 
   const [studentInfo, setStudentInfo] = useState<StudentInfoDto | null>(null);
   const [activePanel, setActivePanel] = useState<Panel>("studentInfo");
 
   useEffect(() => {
-    if (!studentId) return;
-    api.getStudentInfo(+studentId).then(setStudentInfo);
-  }, [studentId]);
+    let cancelled = false;
+    setLoading(true); setError(""); setStudentCard(null); setStudentInfo(null);
+    const load = async () => {
+      try {
+        if (!studentId || !Number.isSafeInteger(+studentId) || +studentId <= 0 || !disciplineId)
+          throw new Error("Выберите дисциплину и корректную карточку ученика.");
+        // URL identifies a user; API mutations identify the relationship in this discipline.
+        const students = await api.getStudents(disciplineId);
+        if (cancelled) return;
+        useStudentStore.getState().setStudents(students);
+        const card = students.find(s => s.studentId === +studentId);
+        if (!card) throw new Error("Ученик не найден среди ваших учеников в выбранной дисциплине.");
+        const info = await api.getStudentInfo(card.id);
+        if (cancelled) return;
+        setStudentCard(card); setStudentInfo(info);
+      } catch (e) {
+        if (!cancelled) setError(e instanceof Error ? e.message : "Не удалось загрузить карточку.");
+      } finally { if (!cancelled) setLoading(false); }
+    };
+    void load();
+    return () => { cancelled = true; };
+  }, [studentId, disciplineId, retry]);
 
   return (
     <div className="min-h-screen bg-background text-text">
@@ -51,16 +78,18 @@ const StudentInfoPage = () => {
 
       {/* Контент */}
       <div className="p-4">
-        {activePanel === "solutionAccess" && studentId && Number.isSafeInteger(+studentId) && +studentId > 0 && (
-          <SolutionAccessPanel key={studentId} relationshipId={+studentId} />
+        {loading && <p role="status">Загрузка карточки…</p>}
+        {error && <div role="alert">{error} <button onClick={() => setRetry(n => n + 1)}>Повторить</button></div>}
+        {activePanel === "solutionAccess" && studentCard && (
+          <SolutionAccessPanel key={studentCard.id} relationshipId={studentCard.id} />
         )}
         {activePanel === "studentInfo" && studentCard && (
           <StudentBasicInfoPanel studentCard={studentCard} />
         )}
 
-        {activePanel === "completedTopics" && studentInfo && (
+        {activePanel === "completedTopics" && studentInfo && studentCard && (
           <CompletedTopicsPanel
-            studentId={+studentId!}
+            studentId={studentCard.id}
             initialCompletedTopicIds={studentInfo.completedTopicIds ?? []}
             onUpdate={(updatedIds) =>
               setStudentInfo(
