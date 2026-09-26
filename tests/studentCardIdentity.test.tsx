@@ -5,6 +5,7 @@ import StudentInfoPage from "../src/pages/StudentInfoPage";
 import { api } from "../src/lib/api";
 import { useDisciplineStore } from "../src/store/disciplineStore";
 import { useStudentStore } from "../src/store/studentStore";
+import { createEmptyStudentInfo } from "../src/utils/createEmptyStudentInfo";
 vi.mock("../src/lib/api", () => ({ api: { getStudents: vi.fn(), getStudentInfo: vi.fn() } }));
 vi.mock("../src/components/Header", () => ({ default: () => null }));
 vi.mock("../src/components/studentCard/StudentBasicInfoPanel", () => ({ default: () => null }));
@@ -16,7 +17,7 @@ function show() { render(<MemoryRouter initialEntries={["/student/13"]}><Routes>
 it("resolves relationship from API after reload, not from user ID or stale cache", async () => {
   useStudentStore.setState({ students: [{ id: 15, studentId: 13, login: "old-discipline", lastActiveAt: null }] });
   vi.mocked(api.getStudents).mockResolvedValue([{ id: 16, studentId: 13, login: "test", lastActiveAt: null }]);
-  vi.mocked(api.getStudentInfo).mockResolvedValue({ completedTopicIds: [] } as Awaited<ReturnType<typeof api.getStudentInfo>>);
+  vi.mocked(api.getStudentInfo).mockResolvedValue(createEmptyStudentInfo());
   show();
   await waitFor(() => expect(api.getStudentInfo).toHaveBeenCalledWith(16));
   fireEvent.click(screen.getByText("🔑 Доступ к решениям"));
