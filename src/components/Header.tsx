@@ -53,12 +53,12 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="z-50 bg-primary text-text_light px-6 py-3 shadow flex justify-between items-center">
-      <div className="flex items-center gap-4">
+    <header className="z-50 bg-primary text-text_light px-4 sm:px-6 py-3 shadow grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)] lg:items-center">
+      <div className="flex min-w-0 items-center gap-2 sm:gap-4">
         {showBackButton && (
           <button
             onClick={() => navigate(-1)}
-            className="bg-white text-primary px-3 py-1 rounded hover:bg-secondary"
+            className="min-h-11 shrink-0 bg-white text-primary px-3 py-2 rounded hover:bg-secondary"
           >
             ← Назад
           </button>
@@ -66,9 +66,10 @@ const Header: React.FC = () => {
 
         {!isTasksPage && (
           <select
+            aria-label="Дисциплина"
             value={disciplineId ?? ""}
             onChange={(e) => setPendingDisciplineId(parseInt(e.target.value))}
-            className="border px-3 py-1 rounded text-black"
+            className="min-h-11 min-w-0 w-full border px-2 py-2 rounded text-black"
           >
             <option value="" disabled>
               Выберите дисциплину
@@ -82,7 +83,7 @@ const Header: React.FC = () => {
         )}
       </div>
 
-      <div className="flex-1 text-center">
+      <div className="min-w-0 break-words empty:hidden lg:text-center">
         {location.pathname.startsWith("/student/") && studentCard && (
           <span className="text-sm">
             ID: {studentCard.studentId} — {studentCard.login}
@@ -90,15 +91,15 @@ const Header: React.FC = () => {
         )}
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="min-w-0 break-words empty:hidden lg:text-right">
         {userInfo && (
-          <span className="text-sm cursor-pointer">
+          <span className="text-sm">
             ID: {userInfo.userId} – {userInfo.login} – {userInfo.role}
           </span>
         )}
       </div>
 
-      {error && <p role="alert" className="text-sm max-w-xs">{error}</p>}
+      {error && <p role="alert" className="text-sm min-w-0 break-words lg:col-span-3">{error}</p>}
       {pendingDisciplineId && (
         <PopupConfirm
           message={`Вы уверены, что хотите сменить дисциплину?`}

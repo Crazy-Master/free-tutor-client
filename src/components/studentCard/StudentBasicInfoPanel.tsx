@@ -6,7 +6,7 @@ interface Props {
 
 const StudentBasicInfoPanel: React.FC<Props> = ({ studentCard }) => {
   return (
-    <div className="p-4 border rounded shadow bg-white">
+    <div className="min-w-0 break-words p-4 border rounded shadow bg-white">
       <h2 className="text-xl font-semibold mb-2">Информация о студенте</h2>
       <p><strong>ID:</strong> {studentCard.studentId}</p>
       <p><strong>Логин:</strong> {studentCard.login}</p>

@@ -39,15 +39,15 @@ export default function SolutionAccessPanel({ relationshipId }: { relationshipId
     }
   }
 
-  return <section className="max-w-2xl rounded border bg-white p-4 shadow-sm" aria-labelledby="solution-access-title">
+  return <section className="min-w-0 max-w-2xl break-words rounded border bg-white p-4 shadow-sm" aria-labelledby="solution-access-title">
     <h2 id="solution-access-title" className="text-xl font-semibold mb-3">Доступ к решениям</h2>
     <p className="text-sm mb-4">Разрешение действует для этого ученика и задачи во всех домашних заданиях. Вы можете отозвать только своё разрешение.</p>
     <form className="flex flex-col sm:flex-row gap-2 items-start sm:items-end" onSubmit={e => { e.preventDefault(); void execute("read"); }}>
-      <label className="flex flex-col gap-1 w-full sm:w-auto">ID задачи в нашем банке
-        <input className="border rounded p-2 w-full" inputMode="numeric" value={input} disabled={busy}
+      <label className="flex min-w-0 flex-col gap-1 w-full sm:w-auto">ID задачи в нашем банке
+        <input className="min-h-11 min-w-0 border rounded p-2 w-full" inputMode="numeric" value={input} disabled={busy}
           onChange={e => { setInput(e.target.value); setStatus(null); setError(""); setNotice(""); }} />
       </label>
-      <button className="border rounded px-3 py-2 disabled:opacity-50" disabled={busy} type="submit">Проверить доступ</button>
+      <button className="min-h-11 w-full sm:w-auto border rounded px-3 py-2 disabled:opacity-50" disabled={busy} type="submit">Проверить доступ</button>
     </form>
     <p className="text-sm text-gray-600 mt-2">Используйте внутренний ID, не номер задачи на внешнем сайте. Задача должна относиться к дисциплине этой карточки.</p>
     {busy && <p role="status" className="mt-3">Обновление доступа…</p>}
@@ -63,7 +63,7 @@ export default function SolutionAccessPanel({ relationshipId }: { relationshipId
       </ul>
       {status.ownPermission && (status.otherTeacherPermission || status.correctAnswer) &&
         <p className="text-sm">После отзыва вашего разрешения решение останется доступным по другому основанию.</p>}
-      <button type="button" className="rounded border px-3 py-2 disabled:opacity-50" disabled={busy}
+      <button type="button" className="min-h-11 w-full sm:w-auto rounded border px-3 py-2 disabled:opacity-50" disabled={busy}
         onClick={() => void execute(status.ownPermission ? "revoke" : "grant")}>
         {status.ownPermission ? "Отозвать моё разрешение" : "Открыть решение"}
       </button>

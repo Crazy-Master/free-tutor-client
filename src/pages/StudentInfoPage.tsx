@@ -64,7 +64,7 @@ const StudentInfoContent = ({ studentId, disciplineId }: { studentId?: string; d
       <Header />
 
       {/* Панель кнопок */}
-      <div className="flex flex-wrap gap-2 p-4 border-b bg-gray-50">
+      <div role="group" aria-label="Разделы карточки ученика" className="grid grid-cols-1 min-[360px]:grid-cols-2 sm:flex sm:flex-wrap gap-2 p-4 border-b bg-gray-50 [&>button]:min-w-0 [&>button]:min-h-11 [&>button]:rounded [&>button]:border [&>button]:px-3 [&>button]:py-2 [&>button]:text-left [&>button]:break-words [&>button]:focus-visible:outline-2 [&>button]:focus-visible:outline-primary">
         <button onClick={() => setActivePanel("studentInfo")}>👤 Информация о студенте</button>
         <button onClick={() => setActivePanel("completedTopics")}>📚 Пройденные темы</button>
         <button onClick={() => setActivePanel("solutionAccess")}>🔑 Доступ к решениям</button>
@@ -77,7 +77,7 @@ const StudentInfoContent = ({ studentId, disciplineId }: { studentId?: string; d
       </div>
 
       {/* Контент */}
-      <div className="p-4">
+      <div className="min-w-0 break-words p-4">
         {loading && <p role="status">Загрузка карточки…</p>}
         {error && <div role="alert">{error} <button onClick={() => setRetry(n => n + 1)}>Повторить</button></div>}
         {activePanel === "solutionAccess" && studentCard && (

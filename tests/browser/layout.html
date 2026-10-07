@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="ru">
+<head><meta charset="UTF-8"><title>Responsive layout QA</title>
+<style>body{font:16px sans-serif;margin:16px} iframe{display:block;height:750px;border:1px solid #888;max-width:none} button{padding:12px;margin:4px}</style></head>
+<body>
+  <p>Локальный стенд, вымышленные данные. Ширина iframe в CSS px:</p>
+  <div id="sizes"></div><p id="result" role="status"></p>
+  <iframe title="Карточка ученика" src="./student-card.html" width="375"></iframe>
+  <script type="module">
+    const frame = document.querySelector('iframe');
+    for (const width of [320, 375, 390, 768, 1280]) {
+      const button = document.createElement('button');
+      button.textContent = String(width);
+      button.onclick = () => { frame.width = String(width); };
+      document.querySelector('#sizes').append(button);
+    }
+    setInterval(() => {
+      const doc = frame.contentDocument;
+      if (!doc?.documentElement) return;
+      const actual = doc.documentElement.clientWidth;
+      const content = doc.documentElement.scrollWidth;
+      document.querySelector('#result').textContent = `Viewport: ${actual}px; content: ${content}px; ${content <= actual ? 'PASS — no horizontal overflow' : 'FAIL — overflow'}`;
+    }, 250);
+  </script>
+</body></html>

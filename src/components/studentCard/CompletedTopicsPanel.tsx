@@ -49,20 +49,21 @@ const CompletedTopicsPanel: React.FC<Props> = ({
 
       <div className="space-y-2 max-h-[300px] overflow-y-auto">
         {topics.map((topic) => (
-          <label key={topic.topicId} className="flex items-center gap-2">
+          <label key={topic.topicId} className="flex min-h-11 items-center gap-2">
             <input
               type="checkbox"
+              className="shrink-0"
               checked={selected.includes(topic.topicId)}
               onChange={() => handleToggle(topic.topicId)}
             />
-            <span>{topic.topic}</span>
+            <span className="min-w-0 break-words">{topic.topic}</span>
           </label>
         ))}
       </div>
 
       <button
         onClick={handleSave}
-        className="mt-4 px-4 py-2 bg-primary text-text_light rounded hover:opacity-90"
+        className="mt-4 min-h-11 max-w-full px-4 py-2 bg-primary text-text_light rounded hover:opacity-90"
       >
         💾 Сохранить изменения
       </button>
