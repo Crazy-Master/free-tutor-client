@@ -26,6 +26,8 @@ import {
 } from "../types/api-types";
 
 export const api = {
+  getStudentAssignments: () => request<StudentToTeacherDto[]>("/api/student-to-teacher/student"),
+  getTask: (taskId: number) => request<TaskDto>(`/api/tasks/${taskId}`),
   getSolutionAccess: (relationshipId: number, taskId: number) =>
     request<SolutionAccessStatus>(`/api/solution-access/${relationshipId}/${taskId}`),
   grantSolutionAccess: (relationshipId: number, taskId: number) =>
