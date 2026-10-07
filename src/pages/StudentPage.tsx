@@ -65,7 +65,7 @@ export default function StudentPage() {
   const entries = records.flatMap((record, recordIndex) => groups.flatMap(([field, status]) =>
     (record.information?.[field] ?? []).map((homework, index) => ({ record, homework, status,
       // Legacy homework numbers can repeat within the same relationship.
-      key: `${record.id ?? recordIndex}:${field}:${index}`,
+      key: `${record.id ?? recordIndex}:${homework.homeworkUid && homework.homeworkUid !== "00000000-0000-0000-0000-000000000000" ? homework.homeworkUid : `${field}:${index}`}`,
     }))));
   return <main className="min-h-screen bg-background text-text p-4 sm:p-6">
     <div className="max-w-4xl mx-auto min-w-0 break-words">

@@ -133,6 +133,7 @@ export interface TaskHome {
 }
 
 export interface HomeworkInfo {
+  homeworkUid?: string;
   idHomework: number;
   assignedAt: string;
   completedAt?: string | null;
