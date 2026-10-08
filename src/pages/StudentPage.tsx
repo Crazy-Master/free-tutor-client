@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import ManualWorkPanel from "../components/student/ManualWorkPanel";
 import { api } from "../lib/api";
 import type { DisciplineDto, HomeworkInfo, StudentToTeacherDto, TaskDto } from "../types/api-types";
 
@@ -9,10 +10,15 @@ function dateLabel(value?: string | null) {
   return new Date(value).toLocaleDateString("ru-RU");
 }
 
-function AssignedTask({ taskId }: { taskId: number }) {
+function AssignedTask({ taskId, relationshipId, homeworkUid }: { taskId: number; relationshipId?: number; homeworkUid?: string }) {
   const [task, setTask] = useState<TaskDto | null>(null);
   const [error, setError] = useState("");
   const [retry, setRetry] = useState(0);
+  const acceptedSeen = useRef(false);
+  const refreshTask = useCallback(() => {
+    if (acceptedSeen.current) return;
+    acceptedSeen.current = true; setRetry(n => n + 1);
+  }, []);
   useEffect(() => {
     let cancelled = false;
     setTask(null); setError("");
@@ -27,20 +33,44 @@ function AssignedTask({ taskId }: { taskId: number }) {
         {task.textContent && <p className="whitespace-pre-wrap mt-3">{task.textContent}</p>}
         {task.imageContent?.imageBase64 && <img className="mt-3 max-w-full h-auto" src={task.imageContent.imageBase64} alt={`Условие задачи ${taskId}`} />}
         {!task.textContent && !task.imageContent?.imageBase64 && <p>Условие задачи пока недоступно.</p>}
-        <p className="text-sm mt-4">Отправка ответа появится на следующем этапе. Просмотр задачи не изменяет прогресс.</p>
+        {task.problemSolving && <details className="mt-4 rounded border p-3"><summary className="cursor-pointer min-h-11">Посмотреть решение</summary>
+          {task.problemSolving.shortAnswer != null && <p>Краткий ответ: {task.problemSolving.shortAnswer}</p>}
+          {task.problemSolving.textSolution && <p className="whitespace-pre-wrap">{task.problemSolving.textSolution}</p>}
+          {[task.problemSolving.solutionBase64, ...(task.problemSolving.solutionOwnBase64 ?? [])].filter(Boolean).map((image, i) =>
+            <img key={i} className="max-w-full h-auto mt-3" alt={`Решение ${i + 1}`} src={image!.startsWith("data:") ? image : `data:image/png;base64,${image}`} />)}
+        </details>}
+        {relationshipId && homeworkUid && homeworkUid !== "00000000-0000-0000-0000-000000000000"
+          ? <ManualWorkPanel key={`${relationshipId}:${homeworkUid}:${taskId}`} relationshipId={relationshipId} homeworkUid={homeworkUid} taskId={taskId} onAccepted={refreshTask} />
+          : <p className="text-sm mt-4">Для отправки работы обновите список ДЗ. Просмотр задачи не изменяет прогресс.</p>}
       </>}
   </section>;
 }
 
-function HomeworkView({ homework }: { homework: HomeworkInfo }) {
+function HomeworkView({ homework, relationshipId }: { homework: HomeworkInfo; relationshipId?: number }) {
   const [selectedTask, setSelectedTask] = useState<number | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [testNotice, setTestNotice] = useState("");
+  const [submitted, setSubmitted] = useState(!!homework.submittedAt);
+  const submitPending = useState(() => ({ current: false }))[0];
+  async function submitTest() {
+    if (!relationshipId || !homework.homeworkUid || submitPending.current) return;
+    submitPending.current = true; setSubmitting(true); setTestNotice("");
+    try { await api.submitManualTest(relationshipId, homework.homeworkUid); setSubmitted(true); setTestNotice("Тест сдан на проверку преподавателю."); }
+    catch (e) { setTestNotice(e instanceof Error ? e.message : "Не удалось сдать тест."); }
+    finally { submitPending.current = false; setSubmitting(false); }
+  }
   const tasks = [...new Set((homework.taskIds ?? []).map(t => t.id).filter(id => Number.isSafeInteger(id) && id > 0))];
   return <div className="mt-3">
+    {(homework.type === 1 || homework.type === "Test") && relationshipId && homework.homeworkUid && <div className="mb-3">
+      <p>Работы по задачам теста отправляются отдельно. После отправки всех работ сдайте тест целиком.</p>
+      <button className="min-h-11 border rounded px-3 py-2" disabled={submitting || submitted} onClick={() => void submitTest()}>{submitted ? "Тест сдан" : "Сдать тест на проверку"}</button>
+      {testNotice && <p role="status">{testNotice}</p>}
+    </div>}
     {tasks.length === 0 ? <p>В этом задании пока нет задач.</p> : <>
       <div role="group" aria-label="Задачи домашнего задания" className="flex flex-wrap gap-2">
         {tasks.map((id, i) => <button key={id} className="min-h-11 rounded border px-3 py-2" aria-pressed={selectedTask === id} onClick={() => setSelectedTask(id)}>Задача {i + 1} · #{id}</button>)}
       </div>
-      {selectedTask !== null && <AssignedTask key={selectedTask} taskId={selectedTask} />}
+      {selectedTask !== null && <AssignedTask key={selectedTask} taskId={selectedTask} relationshipId={relationshipId} homeworkUid={homework.homeworkUid} />}
     </>}
   </div>;
 }
@@ -84,7 +114,7 @@ export default function StudentPage() {
           <p>{status} · Назначено: {dateLabel(homework.assignedAt)}</p>
           {homework.completedAt && <p>Завершено: {dateLabel(homework.completedAt)}</p>}
           <button className="min-h-11 mt-2 rounded border px-3 py-2" aria-expanded={open === key} onClick={() => setOpen(open === key ? null : key)}>{open === key ? "Скрыть задание" : "Открыть задание"}</button>
-          {open === key && <HomeworkView key={key} homework={homework} />}
+          {open === key && <HomeworkView key={key} homework={homework} relationshipId={record.id} />}
         </article>;
       })}
     </div>

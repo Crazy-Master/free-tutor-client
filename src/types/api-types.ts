@@ -133,12 +133,13 @@ export interface TaskHome {
 }
 
 export interface HomeworkInfo {
+  submittedAt?: string | null;
   homeworkUid?: string;
   idHomework: number;
   assignedAt: string;
   completedAt?: string | null;
   taskIds: { id: number; type: TaskType }[];
-  type: HomeworkType;
+  type: HomeworkType | number;
 }
 
 export enum HomeworkType {

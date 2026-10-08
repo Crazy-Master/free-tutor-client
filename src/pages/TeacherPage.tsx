@@ -26,6 +26,7 @@ const TeacherPage = () => {
   return (
     <div className="min-h-screen bg-background text-text">
       <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <button className="min-h-11 rounded border px-4 py-2 md:col-span-2" onClick={() => navigate("/reviews")}>Проверка работ учеников</button>
         <div>
           {panelView === "students" && (
             <StudentList

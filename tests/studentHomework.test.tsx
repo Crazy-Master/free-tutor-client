@@ -5,7 +5,7 @@ import { api } from "../src/lib/api";
 import { createEmptyStudentInfo } from "../src/utils/createEmptyStudentInfo";
 import { HomeworkType, TaskType, type StudentToTeacherDto, type TaskDto } from "../src/types/api-types";
 
-vi.mock("../src/lib/api", () => ({ api: { getStudentAssignments: vi.fn(), getDisciplines: vi.fn(), getTask: vi.fn() } }));
+vi.mock("../src/lib/api", () => ({ api: { getStudentAssignments: vi.fn(), getDisciplines: vi.fn(), getTask: vi.fn(), getManualWorkHistory: vi.fn() } }));
 function record(id = 16, taskId = 825): StudentToTeacherDto {
   return { id, studentId: 13, teacherId: 12, disciplineId: 5, information: {
     ...createEmptyStudentInfo(), homeworks: [{ idHomework: 1, assignedAt: "2026-10-07T10:00:00Z", type: HomeworkType.Classic, taskIds: [{ id: taskId, type: TaskType.Forced }] }],
@@ -19,6 +19,24 @@ beforeEach(() => {
   vi.mocked(api.getTask).mockImplementation(async id => task(id));
 });
 afterEach(cleanup);
+it("refreshes the authorized solution once after acceptance, without a reload loop", async () => {
+  const data = record();
+  data.information.homeworks[0].homeworkUid = "719d8b01-52f9-47eb-a664-597672dfd3c6";
+  vi.mocked(api.getStudentAssignments).mockResolvedValue([data]);
+  vi.mocked(api.getManualWorkHistory).mockResolvedValue([{ id: "work", relationshipId: 16, homeworkUid: data.information.homeworks[0].homeworkUid,
+    homeworkNumber: 1, taskId: 825, studentId: 13, teacherId: 12, text: "", images: [], status: 1, comment: "", reviewedAt: null, submittedAt: "2026-10-08T12:00:00Z" }]);
+  vi.mocked(api.getTask).mockResolvedValue({ ...task(825), problemSolving: { shortAnswer: 42, textSolution: "Разрешённое решение" } });
+  render(<StudentPage />);
+  fireEvent.click(await screen.findByText("Открыть задание"));
+  fireEvent.click(screen.getByText("Задача 1 · #825"));
+  await screen.findByText("Зачтено ·", { exact: false });
+  await act(async () => {});
+  expect(screen.getByText("Разрешённое решение")).toBeTruthy();
+  expect(api.getTask).toHaveBeenCalledTimes(2);
+  // React can batch the cached task response and avoid unmounting the panel.
+  expect(vi.mocked(api.getManualWorkHistory).mock.calls.length).toBeGreaterThanOrEqual(1);
+  expect(vi.mocked(api.getManualWorkHistory).mock.calls.length).toBeLessThanOrEqual(2);
+});
 it("loads own list without a client-supplied student ID; tasks are loaded only on demand", async () => {
   render(<StudentPage />);
   await screen.findByText("Домашнее задание №1");
@@ -69,7 +87,7 @@ it("shows all three statuses and empty homework without inventing tasks", async 
   expect(screen.getByText(/В этом задании пока нет задач/)).toBeTruthy();
 });
 it("does not render answer/solution fields or interpret task text as HTML", async () => {
-  vi.mocked(api.getTask).mockResolvedValue({ ...task(825), textContent: "<b>condition</b>", answerTask: "SECRET", problemSolving: { textSolution: "PRIVATE" } });
+  vi.mocked(api.getTask).mockResolvedValue({ ...task(825), textContent: "<b>condition</b>", answerTask: "SECRET", problemSolving: undefined });
   render(<StudentPage />);
   fireEvent.click(await screen.findByText("Открыть задание"));
   fireEvent.click(screen.getByText("Задача 1 · #825"));

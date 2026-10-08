@@ -11,6 +11,7 @@ import ProtectedRoute from "../lib/ProtectedRoute";
 import Layout from "../components/Layout";
 import RouteGuard from "../lib/RouteGuard";
 import TasksPage from "../pages/TasksPage";
+import ReviewPage from "../pages/ReviewPage";
 
 export const appRoutes: RouteObject[] = [
   {
@@ -28,6 +29,7 @@ export const appRoutes: RouteObject[] = [
       </ProtectedRoute>
     ),
     children: [
+      { path: "/reviews", element: <RouteGuard role="teacher"><ReviewPage /></RouteGuard> },
       {
         path: "/teacher",
         element: (

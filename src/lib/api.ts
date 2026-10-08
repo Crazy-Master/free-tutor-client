@@ -1,4 +1,5 @@
 import { request, authClient } from "./http";
+import type { ManualWork, SubmitWork, WorkStatus } from "../types/manual-work";
 export interface SolutionAccessStatus {
   taskId: number;
   taskIdExternal: string;
@@ -26,6 +27,14 @@ import {
 } from "../types/api-types";
 
 export const api = {
+  submitManualTest: (relationshipId: number, homeworkUid: string) => request<{ submitted: boolean }>(`/api/manual-work/student/${relationshipId}/${homeworkUid}/submit-test`, "POST"),
+  submitManualWork: (relationshipId: number, homeworkUid: string, taskId: number, input: SubmitWork) =>
+    request<ManualWork>(`/api/manual-work/${relationshipId}/${homeworkUid}/${taskId}`, "POST", input),
+  getManualWorkHistory: (relationshipId: number, homeworkUid: string, taskId: number) =>
+    request<ManualWork[]>(`/api/manual-work/student/${relationshipId}/${homeworkUid}/${taskId}`),
+  getReviewQueue: (page = 1, history = false) => request<ManualWork[]>(`/api/manual-work/teacher?page=${page}&history=${history}`),
+  getManualWork: (id: string) => request<ManualWork>(`/api/manual-work/${id}`),
+  reviewManualWork: (id: string, status: WorkStatus, comment: string) => request<ManualWork>(`/api/manual-work/${id}/review`, "PUT", { status, comment }),
   getStudentAssignments: () => request<StudentToTeacherDto[]>("/api/student-to-teacher/student"),
   getTask: (taskId: number) => request<TaskDto>(`/api/tasks/${taskId}`),
   getSolutionAccess: (relationshipId: number, taskId: number) =>
