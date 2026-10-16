@@ -39,7 +39,7 @@ export class AuthClient {
   private memory: RecordValue = { boundary: "initial", data: null, loggedOut: false };
   constructor(private options: {
     baseUrl: string; storage: Pick<Storage, "getItem" | "setItem" | "removeItem">;
-    fetch: typeof fetch; lock?: <T>(operation: () => Promise<T>) => Promise<T>;
+    fetch: typeof fetch; lock?: <T>(operation: () => Promise<T>, signal: AbortSignal) => Promise<T>;
     timeoutMs?: number;
   }) {}
   getSnapshot = () => this.state;
@@ -95,7 +95,27 @@ export class AuthClient {
     this.accept({ tokenString: this.state.token, userAuthDto: user }, this.state.boundary);
   };
   private locked<T>(operation: () => Promise<T>): Promise<T> {
-    const result = this.authQueue.then(() => this.options.lock ? this.options.lock(operation) : operation());
+    // A suspended tab can hold the cross-tab lock indefinitely. Bound the wait,
+    // but never bypass the lock or run an abandoned authentication command later.
+    const controller = new AbortController();
+    let started = false;
+    let timer: ReturnType<typeof setTimeout>;
+    const timeoutError = new ApiError("Не удалось дождаться другой вкладки приложения. Закройте зависшие вкладки FreeTutor и повторите попытку.");
+    const waiting = new Promise<never>((_, reject) => {
+      timer = setTimeout(() => {
+        if (!started) { controller.abort(); reject(timeoutError); }
+      }, this.options.timeoutMs ?? 15_000);
+    });
+    const queued = this.authQueue.then(() => {
+      const run = () => {
+        if (controller.signal.aborted) throw timeoutError;
+        started = true; clearTimeout(timer);
+        return operation();
+      };
+      if (controller.signal.aborted) throw timeoutError;
+      return this.options.lock ? this.options.lock(run, controller.signal) : run();
+    });
+    const result = Promise.race([queued, waiting]).finally(() => clearTimeout(timer));
     this.authQueue = result.then(() => undefined, () => undefined);
     return result;
   }

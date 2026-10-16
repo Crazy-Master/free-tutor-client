@@ -13,7 +13,10 @@ function App() {
 
   const session = useAuth();
   const element = useRoutes(appRoutes);
-  if (session.status === "checking") return <div role="status" className="p-6 text-text">Восстанавливаем сессию…</div>;
+  if (session.status === "checking") return <div className="p-6 space-y-4 text-text">
+    <p role="status">Восстанавливаем сессию…</p>
+    <button className="min-h-11 underline" onClick={authClient.dismissSession}>Войти заново</button>
+  </div>;
   if (session.status === "error") return <div role="alert" className="p-6 space-y-4 text-text">
     <p>{session.error}</p>
     <button className="underline mr-4" onClick={() => void authClient.bootstrap()}>Повторить</button>

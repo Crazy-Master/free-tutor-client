@@ -18,11 +18,11 @@ const Layout: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <div className="fixed top-0 left-0 right-0 z-50 bg-white shadow">
+      <div className="sticky top-0 z-50 bg-white shadow">
         <Header        />
       </div>
 
-      <div className="pt-[80px] px-6 flex-1 overflow-y-auto">
+      <div className="px-4 sm:px-6 flex-1 min-w-0">
         <Outlet />
       </div>
     </div>

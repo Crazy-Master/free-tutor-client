@@ -7,6 +7,7 @@ import PopupConfirm from "./ui/PopupConfirm";
 import { api } from "../lib/api";
 import { DisciplineDto } from "../types/api-types";
 import { useUser } from "../store/user";
+import LogoutButton from "./LogoutButton";
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
@@ -91,12 +92,13 @@ const Header: React.FC = () => {
         )}
       </div>
 
-      <div className="min-w-0 break-words empty:hidden lg:text-right">
+      <div className="min-w-0 break-words flex flex-wrap items-center gap-3 lg:justify-end">
         {userInfo && (
           <span className="text-sm">
             ID: {userInfo.userId} – {userInfo.login} – {userInfo.role}
           </span>
         )}
+        <LogoutButton />
       </div>
 
       {error && <p role="alert" className="text-sm min-w-0 break-words lg:col-span-3">{error}</p>}

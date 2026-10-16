@@ -22,6 +22,34 @@ function setup(initial: AuthResponse | null = data()) {
 afterEach(() => vi.useRealTimers());
 
 describe("session lifecycle", () => {
+  it("bounds cross-tab lock waiting and never executes an abandoned refresh later", async () => {
+    vi.useFakeTimers();
+    const store = storage();
+    const fetch = vi.fn<typeof globalThis.fetch>().mockResolvedValue(response(data()));
+    let release!: () => Promise<void>;
+    let first = true;
+    const client = new AuthClient({ baseUrl: "https://api.test", storage: store, fetch, timeoutMs: 100,
+      lock: async (operation, signal) => {
+        if (first) {
+          first = false;
+          release = async () => { expect(signal.aborted).toBe(true); await operation(); };
+          return await new Promise<never>(() => {});
+        }
+        return operation();
+      },
+    });
+    const boot = client.bootstrap();
+    await vi.advanceTimersByTimeAsync(101);
+    await boot;
+    expect(client.getSnapshot().status).toBe("error");
+    expect(client.getSnapshot().error).toContain("другой вкладки");
+    expect(fetch).not.toHaveBeenCalled();
+    await expect(release()).rejects.toThrow("другой вкладки");
+    // A timed-out lock must not poison the local command queue.
+    await client.bootstrap();
+    expect(client.getSnapshot().status).toBe("authenticated");
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
   it("restores cached user and token without a refresh", async () => {
     const { client, fetch } = setup();
     await client.bootstrap();

@@ -9,11 +9,14 @@ export const useLoadStudents = () => {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [retry, setRetry] = useState(0);
 
   useEffect(() => {
-    if (!disciplineId) return;
+    setError(null);
+    if (!disciplineId) { setLoading(false); setStudents([]); return; }
 
     let cancelled = false;
+    setStudents([]);
     const load = async () => {
       try {
         setLoading(true);
@@ -24,7 +27,6 @@ export const useLoadStudents = () => {
       } catch (e) {
         if (cancelled) return;
         if (e instanceof Error) {
-          console.error("Ошибка API:", e.message);
           setError(e.message);
         }
       } finally {
@@ -34,7 +36,7 @@ export const useLoadStudents = () => {
 
     void load();
     return () => { cancelled = true; };
-  }, [disciplineId, setStudents]);
+  }, [disciplineId, setStudents, retry]);
 
-  return { loading, error };
+  return { loading, error, reload: () => setRetry(n => n + 1) };
 };

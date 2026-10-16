@@ -21,13 +21,17 @@ const TeacherPage = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [panelView, setPanelView] = useState<"students" | "profile" | "settings">("students");
 
-  const { loading } = useLoadStudents();
+  const { loading, error, reload } = useLoadStudents();
 
   return (
     <div className="min-h-screen bg-background text-text">
       <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
         <button className="min-h-11 rounded border px-4 py-2 md:col-span-2" onClick={() => navigate("/reviews")}>Проверка работ учеников</button>
         <div>
+          {panelView === "students" && error && <div role="alert" className="mb-3 space-y-2 text-red-700">
+            <p>{error}</p>
+            <button className="min-h-11 underline" onClick={reload}>Повторить загрузку учеников</button>
+          </div>}
           {panelView === "students" && (
             <StudentList
               students={students}

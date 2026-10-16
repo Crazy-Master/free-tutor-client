@@ -23,7 +23,7 @@ const storage = {
 export const authClient = new AuthClient({
   baseUrl: (import.meta.env.VITE_API_BASE_URL || "https://api-tutor-master.ru").replace(/\/$/, ""),
   storage, fetch: (...args) => fetch(...args),
-  lock: operation => navigator.locks ? navigator.locks.request("freetutor-auth", operation) : operation(),
+  lock: (operation, signal) => navigator.locks ? navigator.locks.request("freetutor-auth", { signal }, operation) : operation(),
 });
 window.addEventListener("storage", event => { if (event.key === SESSION_KEY) authClient.sync(); });
 export const request = <T>(path: string, method = "GET", body?: unknown,

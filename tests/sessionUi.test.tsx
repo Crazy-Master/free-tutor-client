@@ -28,6 +28,16 @@ afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 const show = (path = "/login") => render(<StrictMode><MemoryRouter initialEntries={[path]}><App /></MemoryRouter></StrictMode>);
 
 describe("session UI", () => {
+  it("exposes a working logout button in the protected header", async () => {
+    fetchMock.mockImplementation(respond());
+    await authClient.authenticate("/api/auth/login", {});
+    show("/teacher");
+    fireEvent.click(await screen.findByRole("button", { name: /Выйти/ }));
+    expect(await screen.findByText("Вход в систему")).toBeTruthy();
+    expect(screen.queryByText("Кабинет преподавателя")).toBeNull();
+    await act(async () => {});
+    expect(fetchMock.mock.calls.some(([url]) => String(url).endsWith("/api/auth/logout"))).toBe(true);
+  });
   it("remounts private screens when another tab switches accounts", async () => {
     fetchMock.mockImplementation(respond());
     await authClient.authenticate("/api/auth/login", {});
