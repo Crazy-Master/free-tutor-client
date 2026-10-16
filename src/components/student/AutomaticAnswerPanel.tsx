@@ -76,8 +76,8 @@ export default function AutomaticAnswerPanel({ relationshipId, homeworkUid, task
   return <section aria-label="Краткие ответы" className="mt-4 border-t pt-4 space-y-3">
     <h4 className="font-semibold">Краткий ответ</h4>
     {!automatic && <p>{mode === 3 ? "Для задачи нужна ручная проверка преподавателем." : "Автоматическая проверка не настроена. Можно отправить работу преподавателю."}</p>}
-    {isTest && !submitted && <p>До сдачи теста результат скрыт. Можно заменить сохранённый краткий ответ; учтётся последняя версия.</p>}
-    {isTest && submitted && <p>Тест сдан. Исправления неверных ответов проверяются сразу.</p>}
+    {isTest && !submitted && <p>{automatic ? "До сдачи теста результат скрыт. Можно заменить сохранённый краткий ответ; учтётся последняя версия." : "Ручная работа станет доступна преподавателю для оценки после сдачи теста целиком."}</p>}
+    {isTest && submitted && <p>{automatic ? "Тест сдан. Исправления неверных ответов проверяются сразу." : "Тест сдан. Ручные работы проверяет преподаватель."}</p>}
     <button disabled={busy || loading || finalizing} className="min-h-11 underline" onClick={() => setRetry(n => n + 1)}>Обновить историю ответов</button>
     {loading && <p role="status">Загрузка ответов…</p>}
     {error && <p role="alert" className="text-red-700">{error}</p>}
