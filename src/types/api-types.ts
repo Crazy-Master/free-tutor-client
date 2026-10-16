@@ -140,7 +140,7 @@ export interface HomeworkInfo {
   idHomework: number;
   assignedAt: string;
   completedAt?: string | null;
-  taskIds: { id: number; type: TaskType }[];
+  taskIds: { id: number; type: TaskType; completedAt?: string | null }[];
   type: HomeworkType | number;
 }
 

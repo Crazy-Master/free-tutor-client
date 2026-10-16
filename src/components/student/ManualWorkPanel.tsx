@@ -1,13 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import { api } from "../../lib/api";
+import type { SubmissionState } from "../../types/answer-attempt";
 import { workStatusLabel, type ManualWork, type SubmitWork, type WorkImage } from "../../types/manual-work";
 
 export function WorkPhotos({ images }: { images: WorkImage[] }) {
   return <div className="space-y-3">{images.map((image, i) => <img key={i} className="max-w-full h-auto rounded border" alt={`Фото решения ${i + 1}`} src={`data:${image.mimeType};base64,${image.data}`} />)}</div>;
 }
 
-export default function ManualWorkPanel({ relationshipId, homeworkUid, taskId, onAccepted }: {
+const manualState = (items: ManualWork[]): SubmissionState => items.some(w => w.status === 1) ? "accepted" : items.some(w => w.status === 0) ? "pending" : "ready";
+export default function ManualWorkPanel({ relationshipId, homeworkUid, taskId, onAccepted, onStateChange, onSaved, onBusyChange, disabledReason, refreshKey = 0, completed = false }: {
   relationshipId: number; homeworkUid: string; taskId: number; onAccepted: () => void;
+  onStateChange?: (state: SubmissionState) => void; onSaved?: () => void; disabledReason?: string; refreshKey?: number;
+  onBusyChange?: (busy: boolean) => void;
+  completed?: boolean;
 }) {
   const [history, setHistory] = useState<ManualWork[]>([]);
   const [text, setText] = useState("");
@@ -27,21 +32,22 @@ export default function ManualWorkPanel({ relationshipId, homeworkUid, taskId, o
   useEffect(() => {
     let cancelled = false;
     setLoading(true); setHistoryReady(false); setError("");
+    onStateChange?.("loading");
     void api.getManualWorkHistory(relationshipId, homeworkUid, taskId).then(items => {
-      if (!cancelled) { setHistoryReady(true); setHistory(items); if (items.some(w => w.status === 1)) onAccepted(); }
-    }).catch(e => { if (!cancelled) setError(e instanceof Error ? e.message : "Не удалось загрузить работы."); })
+      if (!cancelled) { setHistoryReady(true); setHistory(items); onStateChange?.(manualState(items)); if (items.some(w => w.status === 1)) onAccepted(); }
+    }).catch(e => { if (!cancelled) { setError(e instanceof Error ? e.message : "Не удалось загрузить работы."); onStateChange?.("error"); } })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
     // The parent supplies a stable callback; identity is remounted for each task.
-  }, [relationshipId, homeworkUid, taskId, retry, onAccepted]);
+  }, [relationshipId, homeworkUid, taskId, retry, onAccepted, onStateChange, refreshKey]);
   const locked = history.some(w => w.status === 0 || w.status === 1);
   async function submit() {
-    if (pending.current) return;
+    if (pending.current || disabledReason) return;
     if (!text.trim() && !files.length) { setError("Добавьте текст или фотографии решения."); return; }
     if (files.length > 3 || files.some(f => f.size > 3 * 1024 * 1024 || !["image/png", "image/jpeg", "image/webp"].includes(f.type))) {
       setError("До трёх фотографий JPEG, PNG или WebP, каждая до 3 МБ."); return;
     }
-    pending.current = true; setBusy(true); setError(""); setNotice("");
+    pending.current = true; setBusy(true); onBusyChange?.(true); setError(""); setNotice("");
     try {
       // Preserve request ID and payload after a lost response; explicit edits create a new request.
       if (!request.current) {
@@ -55,11 +61,13 @@ export default function ManualWorkPanel({ relationshipId, homeworkUid, taskId, o
       }
       const work = await api.submitManualWork(relationshipId, homeworkUid, taskId, request.current);
       if (!alive.current) return;
-      setHistory(items => [...items.filter(w => w.id !== work.id), work]);
+      const updated = [...history.filter(w => w.id !== work.id), work];
+      setHistory(updated); onStateChange?.(manualState(updated));
+      if (work.status === 1) onAccepted(); else onSaved?.();
       setText(""); setFiles([]); if (fileInput.current) fileInput.current.value = "";
       request.current = null; setNotice("Работа отправлена преподавателю.");
     } catch (e) { if (alive.current) setError(e instanceof Error ? e.message : "Не удалось отправить работу."); }
-    finally { pending.current = false; if (alive.current) setBusy(false); }
+    finally { pending.current = false; if (alive.current) { setBusy(false); onBusyChange?.(false); } }
   }
   async function view(id: string) {
     if (pending.current) return;
@@ -81,10 +89,12 @@ export default function ManualWorkPanel({ relationshipId, homeworkUid, taskId, o
       <button disabled={busy} className="min-h-11 underline" onClick={() => void view(work.id)}>Посмотреть отправленную работу</button>
     </div>)}
     {detail && <div className="border rounded p-3"><p className="whitespace-pre-wrap">{detail.text}</p><WorkPhotos images={detail.images} /></div>}
-    {!loading && historyReady && !locked && <form className="space-y-3" onSubmit={e => { e.preventDefault(); void submit(); }}>
-      <label className="block">Текст решения<textarea className="block w-full min-h-32 border rounded p-2" maxLength={10000} disabled={busy} value={text} onChange={e => { setText(e.target.value); request.current = null; }} /></label>
-      <label className="block">Фотографии решения (до трёх, по 3 МБ)<input ref={fileInput} className="block max-w-full mt-2" type="file" multiple accept="image/jpeg,image/png,image/webp" disabled={busy} onChange={e => { setFiles(Array.from(e.target.files ?? [])); request.current = null; }} /></label>
-      <button disabled={busy} className="min-h-11 rounded border px-3 py-2 disabled:opacity-50" type="submit">{busy ? "Отправка…" : "Отправить на проверку"}</button>
+    {!loading && historyReady && !locked && disabledReason && <p>{disabledReason}</p>}
+    {!loading && historyReady && !locked && !completed && <form className="space-y-3" onSubmit={e => { e.preventDefault(); void submit(); }}>
+      <label className="block">Текст решения<textarea className="block w-full min-h-32 border rounded p-2" maxLength={10000} disabled={busy || !!disabledReason} value={text} onChange={e => { setText(e.target.value); request.current = null; }} /></label>
+      <label className="block">Фотографии решения (до трёх, по 3 МБ)<input ref={fileInput} className="block max-w-full mt-2" type="file" multiple accept="image/jpeg,image/png,image/webp" disabled={busy || !!disabledReason} onChange={e => { setFiles(Array.from(e.target.files ?? [])); request.current = null; }} /></label>
+      {files.length > 0 && <ul aria-label="Выбранные фотографии">{files.map((file, i) => <li key={i} className="break-words">{file.name}</li>)}</ul>}
+      <button disabled={busy || !!disabledReason} className="min-h-11 rounded border px-3 py-2 disabled:opacity-50" type="submit">{busy ? "Отправка…" : "Отправить на проверку"}</button>
     </form>}
   </section>;
 }

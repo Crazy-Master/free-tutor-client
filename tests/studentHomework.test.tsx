@@ -5,7 +5,7 @@ import { api } from "../src/lib/api";
 import { createEmptyStudentInfo } from "../src/utils/createEmptyStudentInfo";
 import { HomeworkType, TaskType, type StudentToTeacherDto, type TaskDto } from "../src/types/api-types";
 
-vi.mock("../src/lib/api", () => ({ api: { getStudentAssignments: vi.fn(), getDisciplines: vi.fn(), getTask: vi.fn(), getManualWorkHistory: vi.fn() } }));
+vi.mock("../src/lib/api", () => ({ api: { getStudentAssignments: vi.fn(), getDisciplines: vi.fn(), getTask: vi.fn(), getManualWorkHistory: vi.fn(), getAnswerAttempts: vi.fn() } }));
 function record(id = 16, taskId = 825): StudentToTeacherDto {
   return { id, studentId: 13, teacherId: 12, disciplineId: 5, information: {
     ...createEmptyStudentInfo(), homeworks: [{ idHomework: 1, assignedAt: "2026-10-07T10:00:00Z", type: HomeworkType.Classic, taskIds: [{ id: taskId, type: TaskType.Forced }] }],
@@ -17,6 +17,7 @@ beforeEach(() => {
   vi.mocked(api.getDisciplines).mockResolvedValue([{ disciplineId: 5, typeExam: "ОГЭ", discipline: "Физика" }]);
   vi.mocked(api.getStudentAssignments).mockResolvedValue([record()]);
   vi.mocked(api.getTask).mockImplementation(async id => task(id));
+  vi.mocked(api.getAnswerAttempts).mockResolvedValue([]);
 });
 afterEach(cleanup);
 it("renders the authorized string reference without losing leading zeros or using the legacy number", async () => {

@@ -1,4 +1,5 @@
 import { request, authClient } from "./http";
+import type { AnswerAttempt, SubmitAnswer } from "../types/answer-attempt";
 import type { AnswerSettings } from "../types/answer-settings";
 import type { ManualWork, SubmitWork, WorkStatus } from "../types/manual-work";
 export interface SolutionAccessStatus {
@@ -28,6 +29,11 @@ import {
 } from "../types/api-types";
 
 export const api = {
+  submitAnswer: (relationshipId: number, homeworkUid: string, taskId: number, input: SubmitAnswer) =>
+    request<AnswerAttempt>(`/api/answers/${relationshipId}/${homeworkUid}/${taskId}`, "POST", input),
+  getAnswerAttempts: (relationshipId: number, homeworkUid: string, taskId: number, page = 1) =>
+    request<AnswerAttempt[]>(`/api/answers/${relationshipId}/${homeworkUid}/${taskId}?page=${page}`),
+  submitTest: (relationshipId: number, homeworkUid: string) => request<{ submitted: boolean }>(`/api/answers/${relationshipId}/${homeworkUid}/submit-test`, "POST"),
   getAnswerSettings: (taskId: number) => request<AnswerSettings>(`/api/tasks/${taskId}/answer-settings`),
   updateAnswerSettings: (taskId: number, settings: AnswerSettings) => request<AnswerSettings>(`/api/tasks/${taskId}/answer-settings`, "PUT", { mode: settings.mode, referenceAnswer: settings.referenceAnswer, revision: settings.revision }),
   submitManualTest: (relationshipId: number, homeworkUid: string) => request<{ submitted: boolean }>(`/api/manual-work/student/${relationshipId}/${homeworkUid}/submit-test`, "POST"),
