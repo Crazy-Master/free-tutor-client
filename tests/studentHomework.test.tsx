@@ -19,6 +19,14 @@ beforeEach(() => {
   vi.mocked(api.getTask).mockImplementation(async id => task(id));
 });
 afterEach(cleanup);
+it("renders the authorized string reference without losing leading zeros or using the legacy number", async () => {
+  vi.mocked(api.getTask).mockResolvedValue({ ...task(825), checkingMode: 2, referenceAnswer: "00120", problemSolving: { shortAnswer: 42 } });
+  render(<StudentPage />);
+  fireEvent.click(await screen.findByText("Открыть задание"));
+  fireEvent.click(screen.getByText("Задача 1 · #825"));
+  await screen.findByText("Краткий ответ: 00120");
+  expect(screen.queryByText("Краткий ответ: 42")).toBeNull();
+});
 it("refreshes the authorized solution once after acceptance, without a reload loop", async () => {
   const data = record();
   data.information.homeworks[0].homeworkUid = "719d8b01-52f9-47eb-a664-597672dfd3c6";

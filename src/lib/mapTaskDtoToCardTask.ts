@@ -7,13 +7,15 @@ export function mapTaskDtoToCardTask(dto: TaskDto): Task {
   dictionaryStore.setTaskTagIds(dto.taskId, dto.tagIds ?? []);
 
   return {
+    checkingMode: dto.checkingMode,
+    referenceAnswer: dto.referenceAnswer,
     taskId: dto.taskId,
     tagIds: dto.tagIds ?? [],
     topics: dto.topicIds?.map((id) => `Topic ${id}`) ?? [],
     testNumber: dto.testNumber ?? "",
     textContent: dto.textContent,
     imageContent: dto.imageContent,
-    shortAnswer: dto.answerTask ? parseFloat(dto.answerTask) : undefined,
+    shortAnswer: dto.problemSolving?.shortAnswer,
     answerTask: dto.problemSolving ?? null,
     answerType: `Тип ${dto.typeResponseId ?? "-"}`,
     groupNumber: dto.groupNumber,

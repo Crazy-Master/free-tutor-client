@@ -3,6 +3,8 @@ import TaskCardBase from "../task/TaskCardBase";
 import { AnswerTask } from "../../types/answer";
 
 export interface Task {
+  checkingMode?: number;
+  referenceAnswer?: string | null;
   taskId: number;
   tagIds: number[];
   testNumber?: string;

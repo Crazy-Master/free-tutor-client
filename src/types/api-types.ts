@@ -57,6 +57,8 @@ export interface AnswerTask {
 }
 
 export interface TaskDto {
+  checkingMode?: number;
+  referenceAnswer?: string | null;
   taskId: number;
   taskIdExternal: string;
   textContent?: string;

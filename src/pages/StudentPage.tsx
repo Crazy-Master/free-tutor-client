@@ -33,10 +33,10 @@ function AssignedTask({ taskId, relationshipId, homeworkUid }: { taskId: number;
         {task.textContent && <p className="whitespace-pre-wrap mt-3">{task.textContent}</p>}
         {task.imageContent?.imageBase64 && <img className="mt-3 max-w-full h-auto" src={task.imageContent.imageBase64} alt={`Условие задачи ${taskId}`} />}
         {!task.textContent && !task.imageContent?.imageBase64 && <p>Условие задачи пока недоступно.</p>}
-        {task.problemSolving && <details className="mt-4 rounded border p-3"><summary className="cursor-pointer min-h-11">Посмотреть решение</summary>
-          {task.problemSolving.shortAnswer != null && <p>Краткий ответ: {task.problemSolving.shortAnswer}</p>}
-          {task.problemSolving.textSolution && <p className="whitespace-pre-wrap">{task.problemSolving.textSolution}</p>}
-          {[task.problemSolving.solutionBase64, ...(task.problemSolving.solutionOwnBase64 ?? [])].filter(Boolean).map((image, i) =>
+        {(task.problemSolving || task.referenceAnswer != null) && <details className="mt-4 rounded border p-3"><summary className="cursor-pointer min-h-11">Посмотреть решение</summary>
+          {task.referenceAnswer != null ? <p>Краткий ответ: {task.referenceAnswer}</p> : (!task.checkingMode && task.problemSolving?.shortAnswer != null && <p>Краткий ответ: {task.problemSolving.shortAnswer}</p>)}
+          {task.problemSolving?.textSolution && <p className="whitespace-pre-wrap">{task.problemSolving.textSolution}</p>}
+          {[task.problemSolving?.solutionBase64, ...(task.problemSolving?.solutionOwnBase64 ?? [])].filter(Boolean).map((image, i) =>
             <img key={i} className="max-w-full h-auto mt-3" alt={`Решение ${i + 1}`} src={image!.startsWith("data:") ? image : `data:image/png;base64,${image}`} />)}
         </details>}
         {relationshipId && homeworkUid && homeworkUid !== "00000000-0000-0000-0000-000000000000"

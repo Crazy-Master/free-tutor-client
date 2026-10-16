@@ -8,6 +8,8 @@ import { AnswerTask } from "../../types/answer";
 import { useDictionaryStore } from "../../store/dictionaryStore";
 
 interface TaskCardBaseProps {
+  checkingMode?: number;
+  referenceAnswer?: string | null;
   taskId: number;
   taskIdExternal: string;
   testNumber?: string;
@@ -23,6 +25,7 @@ interface TaskCardBaseProps {
 }
 
 const TaskCardBase: React.FC<TaskCardBaseProps> = ({
+  checkingMode, referenceAnswer,
   taskId,
   taskIdExternal,
   testNumber,
@@ -56,6 +59,7 @@ const TaskCardBase: React.FC<TaskCardBaseProps> = ({
         </div>
 
         <SolutionToggle
+          checkingMode={checkingMode} referenceAnswer={referenceAnswer}
           answer={{ ...answerTask }}
           taskId={taskId}
           onExpand={() => setShowSolution((prev) => !prev)}
