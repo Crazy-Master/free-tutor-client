@@ -3,14 +3,29 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import AnswerSettingsEditor from "../src/components/task/AnswerSettingsEditor";
 import { api } from "../src/lib/api";
 import { mapTaskDtoToCardTask } from "../src/lib/mapTaskDtoToCardTask";
+import TaskCardFooter from "../src/components/task/TaskCardFooter";
+import { useUiStore } from "../src/store/uiStore";
 
-vi.mock("../src/lib/api", () => ({ api: { getAnswerSettings: vi.fn(), updateAnswerSettings: vi.fn() } }));
+vi.mock("../src/lib/api", () => ({ api: { getAnswerSettings: vi.fn(), updateAnswerSettings: vi.fn(), getTopicNamesByTaskId: vi.fn(), getTypeResponseNameByTaskId: vi.fn() } }));
 beforeEach(() => {
   vi.resetAllMocks();
   vi.mocked(api.getAnswerSettings).mockResolvedValue({mode:0,referenceAnswer:null,revision:0,legacyShortAnswer:"42"});
   vi.mocked(api.updateAnswerSettings).mockResolvedValue({mode:2,referenceAnswer:"00120",revision:1});
 });
 afterEach(cleanup);
+it("opens task info only on explicit tap on a narrow screen, leaving the editor accessible",async()=>{
+  useUiStore.getState().setWindowWidth(375);
+  vi.mocked(api.getTopicNamesByTaskId).mockResolvedValue([]);
+  vi.mocked(api.getTypeResponseNameByTaskId).mockResolvedValue("Число");
+  render(<TaskCardFooter taskId={825} year={2025} relevance="актуально"/>);
+  const info=screen.getByRole("button",{name:"Инфо"});
+  fireEvent.mouseEnter(info.parentElement!);
+  expect(screen.queryByText("📘 Темы:")).toBeNull();
+  fireEvent.click(info);
+  await screen.findByText("Число");
+  expect(info.getAttribute("aria-expanded")).toBe("true");
+  fireEvent.click(info);expect(screen.queryByText("📘 Темы:")).toBeNull();
+});
 function show(){const onSaved=vi.fn();const onClose=vi.fn();render(<AnswerSettingsEditor taskId={825} onSaved={onSaved} onClose={onClose}/>);return{onSaved,onClose};}
 it("saves leading zeros as a string and preserves the server revision", async () => {
   const {onSaved}=show();

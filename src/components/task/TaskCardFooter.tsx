@@ -55,16 +55,16 @@ const TaskCardFooter: React.FC<Props> = ({
     <div className="flex justify-between items-center mt-4 relative text-sm">
       <div
         className="relative"
-        onMouseEnter={() => setIsHovering(true)}
-        onMouseLeave={() => setIsHovering(false)}
+        onMouseEnter={() => { if (windowWidth >= 1024) setIsHovering(true); }}
+        onMouseLeave={() => { if (windowWidth >= 1024) setIsHovering(false); }}
       >
-        <div className="px-2 py-1 bg-primary text-text_light rounded hover:opacity-90 cursor-pointer">
+        <button type="button" aria-expanded={isHovering} onClick={() => setIsHovering(value => !value)} className="min-h-11 px-2 py-1 bg-primary text-text_light rounded hover:opacity-90 cursor-pointer">
           Инфо
-        </div>
+        </button>
 
         {isHovering && (
           <div
-            className="overflow-x-auto absolute left-0 bottom-0 z-10 bg-white  border shadow-md p-3 rounded w-max text-sm text-left"
+            className={`overflow-x-auto absolute left-0 ${windowWidth >= 1024 ? "bottom-0" : "top-full mt-2"} z-10 bg-white border shadow-md p-3 rounded w-max text-sm text-left`}
             style={{ width: `${Math.min(windowWidth * 0.7, 925)}px` }}
           >
             <div>
