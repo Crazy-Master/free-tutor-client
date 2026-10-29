@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { api } from "../lib/api";
 import { StudentInfoDto, StudentCardInfoDto } from "../types/api-types";
@@ -38,13 +38,16 @@ const StudentInfoContent = ({ studentId, disciplineId }: { studentId?: string; d
   const [createOpened, setCreateOpened] = useState(false);
   const [homeworkError, setHomeworkError] = useState("");
   const [refreshing, setRefreshing] = useState(false);
+  const refreshVersion = useRef(0);
+  useEffect(() => { const version = refreshVersion; return () => { version.current++; }; }, []);
 
   async function refreshHomeworks() {
-    if (!studentCard || refreshing) return;
+    if (!studentCard) return;
+    const version = ++refreshVersion.current;
     setRefreshing(true); setHomeworkError("");
-    try { setStudentInfo(await api.getStudentInfo(studentCard.id)); }
-    catch (e) { setHomeworkError(e instanceof Error ? e.message : "Не удалось обновить список ДЗ."); }
-    finally { setRefreshing(false); }
+    try { const info = await api.getStudentInfo(studentCard.id); if (version === refreshVersion.current) setStudentInfo(info); }
+    catch (e) { if (version === refreshVersion.current) setHomeworkError(e instanceof Error ? e.message : "Не удалось обновить список ДЗ."); }
+    finally { if (version === refreshVersion.current) setRefreshing(false); }
   }
 
   useEffect(() => {
