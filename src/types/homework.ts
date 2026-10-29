@@ -4,6 +4,7 @@ export enum HomeworkType {
   }
   
   export interface GenerateHomeworkDto {
+    requestId: string;
     studentToTeacherId: number;
     automaticTotalTaskCount: number;
     currentTopicTaskCount: number;
@@ -13,10 +14,10 @@ export enum HomeworkType {
     group0Probability: number;
     group2Probability: number;
     group3Probability: number;
-    type: HomeworkType;
+    type: 0 | 1;
   }
 
-  export const defaultGenerateHomeworkDto: Omit<GenerateHomeworkDto, "studentToTeacherId"> = {
+  export const defaultGenerateHomeworkDto: Omit<GenerateHomeworkDto, "studentToTeacherId" | "requestId"> = {
   automaticTotalTaskCount: 15,
   currentTopicTaskCount: 8,
   additionalTaskIds: [],
@@ -25,7 +26,7 @@ export enum HomeworkType {
   group0Probability: 0.1,
   group2Probability: 0.2,
   group3Probability: 0.3,
-  type: HomeworkType.Classic,
+  type: 0,
 };
   
 //const [formData, setFormData] = useState<GenerateHomeworkDto>({

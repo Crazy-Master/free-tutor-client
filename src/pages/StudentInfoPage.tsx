@@ -8,6 +8,7 @@ import CompletedTopicsPanel from "../components/studentCard/CompletedTopicsPanel
 import SolutionAccessPanel from "../components/studentCard/SolutionAccessPanel";
 import StudentBasicInfoPanel from "../components/studentCard/StudentBasicInfoPanel";
 import { useStudentStore } from "../store/studentStore";
+import { CreateHomeworkPanel, TeacherHomeworkList } from "../components/studentCard/TeacherHomeworkPanel";
 
 type Panel =
   | "studentInfo"
@@ -34,6 +35,17 @@ const StudentInfoContent = ({ studentId, disciplineId }: { studentId?: string; d
 
   const [studentInfo, setStudentInfo] = useState<StudentInfoDto | null>(null);
   const [activePanel, setActivePanel] = useState<Panel>("studentInfo");
+  const [createOpened, setCreateOpened] = useState(false);
+  const [homeworkError, setHomeworkError] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
+
+  async function refreshHomeworks() {
+    if (!studentCard || refreshing) return;
+    setRefreshing(true); setHomeworkError("");
+    try { setStudentInfo(await api.getStudentInfo(studentCard.id)); }
+    catch (e) { setHomeworkError(e instanceof Error ? e.message : "Не удалось обновить список ДЗ."); }
+    finally { setRefreshing(false); }
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -68,7 +80,7 @@ const StudentInfoContent = ({ studentId, disciplineId }: { studentId?: string; d
         <button onClick={() => setActivePanel("studentInfo")}>👤 Информация о студенте</button>
         <button onClick={() => setActivePanel("completedTopics")}>📚 Пройденные темы</button>
         <button onClick={() => setActivePanel("solutionAccess")}>🔑 Доступ к решениям</button>
-        <button onClick={() => setActivePanel("createHomework")}>📝 Сформировать ДЗ</button>
+        <button onClick={() => { setCreateOpened(true); setActivePanel("createHomework"); }}>📝 Сформировать ДЗ</button>
         <button onClick={() => setActivePanel("unclearTasks")}>❓ Непонятные задачи</button>
         <button onClick={() => setActivePanel("markCompleted")}>✅ Пройденные задачи</button>
         <button onClick={() => setActivePanel("viewHomework")}>📂 Посмотреть ДЗ</button>
@@ -80,6 +92,20 @@ const StudentInfoContent = ({ studentId, disciplineId }: { studentId?: string; d
       <div className="min-w-0 break-words p-4">
         {loading && <p role="status">Загрузка карточки…</p>}
         {error && <div role="alert">{error} <button onClick={() => setRetry(n => n + 1)}>Повторить</button></div>}
+        {studentInfo && studentCard && disciplineId && <>
+          {createOpened && <div hidden={activePanel !== "createHomework"}>
+            <CreateHomeworkPanel key={studentCard.id} relationshipId={studentCard.id} disciplineId={disciplineId} info={studentInfo}
+              onCreated={homework => {
+                setStudentInfo(prev => prev && { ...prev, homeworks: [...(prev.homeworks ?? []).filter(h => h.homeworkUid !== homework.homeworkUid), homework] });
+                void refreshHomeworks();
+              }} />
+          </div>}
+          {activePanel === "viewHomework" && <div className="space-y-3">
+            <button className="min-h-11 underline" disabled={refreshing} onClick={() => void refreshHomeworks()}>{refreshing ? "Обновление…" : "Обновить список ДЗ"}</button>
+            {homeworkError && <p role="alert">{homeworkError}</p>}
+            <TeacherHomeworkList info={studentInfo} />
+          </div>}
+        </>}
         {activePanel === "solutionAccess" && studentCard && (
           <SolutionAccessPanel key={studentCard.id} relationshipId={studentCard.id} />
         )}

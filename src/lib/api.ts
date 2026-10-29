@@ -2,6 +2,8 @@ import { request, authClient } from "./http";
 import type { AnswerAttempt, SubmitAnswer } from "../types/answer-attempt";
 import type { AnswerSettings } from "../types/answer-settings";
 import type { ManualWork, SubmitWork, WorkStatus } from "../types/manual-work";
+import type { GenerateHomeworkDto } from "../types/homework";
+import type { HomeworkInfo } from "../types/api-types";
 export interface SolutionAccessStatus {
   taskId: number;
   taskIdExternal: string;
@@ -29,6 +31,7 @@ import {
 } from "../types/api-types";
 
 export const api = {
+  generateHomework: (input: GenerateHomeworkDto) => request<HomeworkInfo>("/api/homework/generate", "POST", input),
   submitAnswer: (relationshipId: number, homeworkUid: string, taskId: number, input: SubmitAnswer) =>
     request<AnswerAttempt>(`/api/answers/${relationshipId}/${homeworkUid}/${taskId}`, "POST", input),
   getAnswerAttempts: (relationshipId: number, homeworkUid: string, taskId: number, page = 1) =>
